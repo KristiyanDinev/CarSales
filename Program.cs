@@ -1,4 +1,5 @@
 using CarSales.Database;
+using CarSales.Models.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,17 +18,17 @@ namespace CarSales
                     .GetConnectionString("DefaultConnection") ??
                     ""));
 
-            builder.Services.AddAuthorization(options =>
-            {
-                options.AddPolicy("AdminOnly", policy =>
-                    policy.RequireRole("Admin"));
-            });
+            builder.Services.AddAuthorization();
+            builder.Services.AddAuthentication();
+
+            builder.Services.AddIdentity<IdentityUserModel, IdentityRoleModel>();
 
             builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
 
-            app.MapIdentityApi<IdentityUser>();
+            app.MapIdentityApi<IdentityUserModel>();
+            app.MapSwagger();
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
@@ -35,9 +36,9 @@ namespace CarSales
             app.UseRouting();
 
             app.UseAuthorization();
+            app.UseAuthentication();
 
             app.MapControllers();
-
             app.Run();
         }
     }

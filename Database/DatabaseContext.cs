@@ -1,11 +1,11 @@
 ﻿using CarSales.Models.Database;
-using Microsoft.AspNetCore.Identity;
+using CarSales.Models.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace CarSales.Database
 {
-    public class DatabaseContext: IdentityDbContext<IdentityUser>
+    public class DatabaseContext: IdentityDbContext<IdentityUserModel>
     {
         public DbSet<CarModel> Cars { get; set; }
 
@@ -13,15 +13,11 @@ namespace CarSales.Database
             base(options)
         {
         }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            BuildCarModel(modelBuilder);
-        }
-
-        private void BuildCarModel(ModelBuilder modelBuilder)
-        {
             modelBuilder.Entity<CarModel>().ToTable("Cars");
 
             modelBuilder.Entity<CarModel>()
@@ -59,5 +55,6 @@ namespace CarSales.Database
                 .Property(c => c.ImageUrl)
                 .HasMaxLength(200);
         }
+
     }
 }
