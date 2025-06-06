@@ -1,6 +1,16 @@
-﻿namespace CarSales.Controllers
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
+
+namespace CarSales.Controllers
 {
-    public class CarController
+
+    [EnableRateLimiting("fixed")]
+    [IgnoreAntiforgeryToken]
+    public class CarController : Controller
     {
+
+        public CarController() { }
+
+
     }
 }

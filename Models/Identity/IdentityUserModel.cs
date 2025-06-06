@@ -4,8 +4,7 @@ namespace CarSales.Models.Identity
 {
     public class IdentityUserModel : IdentityUser
     {
-        public string? FirstName { get; set; }
-        public string? LastName { get; set; }
+        public override string? UserName { get; set; }
         public override string? PhoneNumber { get; set; }
         public string? Address { get; set; }
         public string? City { get; set; }

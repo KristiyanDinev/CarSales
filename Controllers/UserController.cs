@@ -2,13 +2,19 @@
 using CarSales.Models.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace CarSales.Controllers
 {
 
+    [EnableRateLimiting("fixed")]
     [IgnoreAntiforgeryToken]
     public class UserController : Controller
     {
+        private const string InvalidLoginAttempt = "Invalid login attempt.";
+        private const string AdminControllerName = "Admin";
+        private const string CarControllerName = "Car";
+        private const string IndexPage = "Car";
 
         private readonly UserManager<IdentityUserModel> _userManager;
         private readonly SignInManager<IdentityUserModel> _signInManager;
@@ -20,10 +26,10 @@ namespace CarSales.Controllers
         {
             _userManager = userManager;
             _signInManager = signInManager;
-            //_roleManager = roleManager;
         }
 
         [HttpGet]
+        [Route("/register")]
         public IActionResult Register()
         {
             return View();
@@ -31,38 +37,41 @@ namespace CarSales.Controllers
 
 
         [HttpGet]
+        [Route("/login")]
         public IActionResult Login()
         {
             return View();
         }
+        
 
         [HttpPost]
-        public async Task<IActionResult> Register(RegisterFormModel model)
+        [Route("/register")]
+        public async Task<IActionResult> Register([FromForm] RegisterFormModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var user = new IdentityUserModel
-                {
-                    UserName = string.Join(model.FirstName, model.LastName),
-                    Email = model.Email,
-                    FirstName = model.FirstName,
-                    LastName = model.LastName
-                };
+                return View(model);
+            }
 
-                var result = await _userManager.CreateAsync(user, model.Password);
+            IdentityUserModel user = new IdentityUserModel
+            {
+                UserName = model.UserName,
+                Email = model.Email
+            };
 
-                if (result.Succeeded)
-                {
-                    // Assign default role (optional)
-                    //await _userManager.AddToRoleAsync(user, "User");
-                    await _signInManager.SignInAsync(user, isPersistent: false);
-                    return RedirectToAction("Index", "Car");
-                }
+            IdentityResult result = await _userManager.CreateAsync(user, model.Password);
 
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
+            if (result.Succeeded)
+            {
+                // Assign default role (optional)
+                //await _userManager.AddToRoleAsync(user, "User");
+                await _signInManager.SignInAsync(user, isPersistent: false);
+                return RedirectToAction(IndexPage, CarControllerName);
+            }
+
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
             }
 
             return View(model);
@@ -70,41 +79,46 @@ namespace CarSales.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> Login(LoginFormModel model)
+        [Route("/login")]
+        public async Task<IActionResult> Login([FromForm] LoginFormModel model)
         {
             if (!ModelState.IsValid)
             {
+                ModelState.AddModelError(string.Empty, InvalidLoginAttempt);
                 return View(model);
             }
-            
 
-            var result = await _signInManager.PasswordSignInAsync(
-                    , 
-                 model.Password, model.RememberMe, lockoutOnFailure: false);
+            IdentityUserModel? user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null || user.UserName == null) {
+                ModelState.AddModelError(string.Empty, InvalidLoginAttempt);
+                return View(model);
+            }
+
+            Microsoft.AspNetCore.Identity.SignInResult result = await _signInManager.PasswordSignInAsync(
+                        user, model.Password, model.RememberMe, lockoutOnFailure: false);
 
             if (result.Succeeded)
             {
-                    var user = await _userManager.FindByEmailAsync(model.Email);
-                    if (user != null && await _userManager.IsInRoleAsync(user, "Admin"))
-                    {
-                        return RedirectToAction("Index", "Admin");
+                if (await _userManager.IsInRoleAsync(user, "Admin"))
+                {
+                    return RedirectToAction(IndexPage, AdminControllerName);
 
-                    }
-                    return RedirectToAction("Index", "Car");
+                }
+                return RedirectToAction(IndexPage, CarControllerName);
             }
 
+            ModelState.AddModelError(string.Empty, InvalidLoginAttempt);
 
-            ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-            
+            return View(model);
         }
 
+
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        [Route("/logout")]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Login");
         }
-
     }
 }

@@ -1,4 +1,3 @@
-D:\Projects\CarSales\bin\Debug\net8.0\appsettings.Development.json
 D:\Projects\CarSales\bin\Debug\net8.0\appsettings.json
 D:\Projects\CarSales\bin\Debug\net8.0\CarSales.staticwebassets.runtime.json
 D:\Projects\CarSales\bin\Debug\net8.0\CarSales.staticwebassets.endpoints.json
@@ -277,3 +276,11 @@ D:\Projects\CarSales\obj\Debug\net8.0\refint\CarSales.dll
 D:\Projects\CarSales\obj\Debug\net8.0\CarSales.pdb
 D:\Projects\CarSales\obj\Debug\net8.0\CarSales.genruntimeconfig.cache
 D:\Projects\CarSales\obj\Debug\net8.0\ref\CarSales.dll
+D:\Projects\CarSales\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+D:\Projects\CarSales\bin\Debug\net8.0\Microsoft.IdentityModel.Abstractions.dll
+D:\Projects\CarSales\bin\Debug\net8.0\Microsoft.IdentityModel.JsonWebTokens.dll
+D:\Projects\CarSales\bin\Debug\net8.0\Microsoft.IdentityModel.Logging.dll
+D:\Projects\CarSales\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.dll
+D:\Projects\CarSales\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+D:\Projects\CarSales\bin\Debug\net8.0\Microsoft.IdentityModel.Tokens.dll
+D:\Projects\CarSales\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll

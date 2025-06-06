@@ -6,6 +6,7 @@ namespace CarSales.Models.Forms
     {
         [Required]
         [EmailAddress]
+        [Display(Name = "Email")]
         public string Email { get; set; } = string.Empty;
 
         [Required]

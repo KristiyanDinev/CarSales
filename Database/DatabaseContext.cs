@@ -18,6 +18,13 @@ namespace CarSales.Database
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<IdentityUserModel>().ToTable("Users");
+            modelBuilder.Entity<IdentityUserModel>()
+                .HasIndex(u => u.Email)
+                .IsUnique();
+             
+            modelBuilder.Entity<IdentityRoleModel>().ToTable("Roles");
+
             modelBuilder.Entity<CarModel>().ToTable("Cars");
 
             modelBuilder.Entity<CarModel>()
