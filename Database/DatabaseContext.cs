@@ -1,9 +1,11 @@
 ﻿using CarSales.Models.Database;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace CarSales.Database
 {
-    public class DatabaseContext: DbContext
+    public class DatabaseContext: IdentityDbContext<IdentityUser>
     {
         public DbSet<CarModel> Cars { get; set; }
 
