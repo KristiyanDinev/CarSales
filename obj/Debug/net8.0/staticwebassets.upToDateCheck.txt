@@ -1,1 +1,4 @@
 wwwroot\favicon.ico
+wwwroot\js\register.js
+wwwroot\css\login.css
+wwwroot\js\login.js

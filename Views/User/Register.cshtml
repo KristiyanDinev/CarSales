@@ -1,0 +1,45 @@
+﻿@model CarSales.Models.Identity.IdentityUserModel;
+
+@{
+    ViewData["Title"] = "Register";
+}
+
+
+<head>
+
+    @await Html.PartialAsync("_Imports")
+
+    <link rel="stylesheet" href="~/css/login.css" />
+    <script src="~/js/register.js"></script>
+</head>
+
+<body>
+    <div class="wrapper">
+        <div class="title"><span>Register Form</span></div>
+
+        <div class="form">
+            @await Html.PartialAsync("_ShowErrors")
+
+            <div class="row">
+                <i class="fas fa-user"></i>
+                <input type="text" placeholder="Username" id="UserName" required />
+            </div>
+            <div class="row">
+                <i class="fas fa-envelope"></i>
+                <input type="email" placeholder="Email" id="Email" required />
+            </div>
+            <div class="row">
+                <i class="fas fa-lock"></i>
+                <input type="password" placeholder="Password" id="Password" required />
+            </div>
+            <div class="row">
+                <i class="fas fa-lock"></i>
+                <input type="password" placeholder="Confirm Password" id="ConfirmPassword" required />
+            </div>
+            <div class="row button">
+                <input type="button" onclick="register()" value="Register" />
+            </div>
+            <div class="signup-link">Have an account? <a href="/login">Login In</a></div>
+        </div>
+    </div>
+</body>

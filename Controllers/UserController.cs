@@ -1,7 +1,11 @@
 ﻿using CarSales.Models.Forms;
 using CarSales.Models.Identity;
+using CarSales.Services;
+using CarSales.Utilities;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.RateLimiting;
 
 namespace CarSales.Controllers
@@ -9,16 +13,13 @@ namespace CarSales.Controllers
 
     [EnableRateLimiting("fixed")]
     [IgnoreAntiforgeryToken]
+    [ApiController]
     public class UserController : Controller
     {
         private const string InvalidLoginAttempt = "Invalid login attempt.";
-        private const string AdminControllerName = "Admin";
-        private const string CarControllerName = "Car";
-        private const string IndexPage = "Car";
 
         private readonly UserManager<IdentityUserModel> _userManager;
         private readonly SignInManager<IdentityUserModel> _signInManager;
-        //private readonly RoleManager<IdentityRole> _roleManager;
 
         public UserController(
             UserManager<IdentityUserModel> userManager,
@@ -37,6 +38,7 @@ namespace CarSales.Controllers
 
 
         [HttpGet]
+        [Route("/")]
         [Route("/login")]
         public IActionResult Login()
         {
@@ -50,7 +52,7 @@ namespace CarSales.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return View(model);
+                return Unauthorized();
             }
 
             IdentityUserModel user = new IdentityUserModel
@@ -65,16 +67,13 @@ namespace CarSales.Controllers
             {
                 // Assign default role (optional)
                 //await _userManager.AddToRoleAsync(user, "User");
-                await _signInManager.SignInAsync(user, isPersistent: false);
-                return RedirectToAction(IndexPage, CarControllerName);
+                return Ok();
             }
 
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError(string.Empty, error.Description);
-            }
+            ModelStateDictionary ModelState1 = ModelState;
+            ErrorUtility.HandleModelErrors(result.Errors.Select(e => e.Description), ref ModelState1);
 
-            return View(model);
+            return Unauthorized();
         }
 
 
@@ -84,39 +83,32 @@ namespace CarSales.Controllers
         {
             if (!ModelState.IsValid)
             {
-                ModelState.AddModelError(string.Empty, InvalidLoginAttempt);
-                return View(model);
+                return Unauthorized();
             }
+
+            string[] errors = new[] { InvalidLoginAttempt };
+            ModelStateDictionary ModelState1 = ModelState;
 
             IdentityUserModel? user = await _userManager.FindByEmailAsync(model.Email);
-            if (user == null || user.UserName == null) {
-                ModelState.AddModelError(string.Empty, InvalidLoginAttempt);
-                return View(model);
+            if (user == null) {
+                ErrorUtility.HandleModelErrors(errors, ref ModelState1);
+                return Unauthorized();
             }
 
-            Microsoft.AspNetCore.Identity.SignInResult result = await _signInManager.PasswordSignInAsync(
-                        user, model.Password, model.RememberMe, lockoutOnFailure: false);
-
-            if (result.Succeeded)
+            Microsoft.AspNetCore.Identity.SignInResult signInResult = await _signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, false);
+            if (signInResult.Succeeded)
             {
-                if (await _userManager.IsInRoleAsync(user, "Admin"))
-                {
-                    return RedirectToAction(IndexPage, AdminControllerName);
-
-                }
-                return RedirectToAction(IndexPage, CarControllerName);
+                return Ok();
             }
 
-            ModelState.AddModelError(string.Empty, InvalidLoginAttempt);
-
-            return View(model);
+            ErrorUtility.HandleModelErrors(errors, ref ModelState1);
+            return Unauthorized();
         }
 
 
         [HttpPost]
         [Route("/logout")]
-        public async Task<IActionResult> Logout()
-        {
+        public async Task<IActionResult> Logout() {
             await _signInManager.SignOutAsync();
             return RedirectToAction("Login");
         }

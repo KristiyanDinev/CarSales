@@ -8,6 +8,7 @@ namespace CarSales.Controllers
     [EnableRateLimiting("fixed")]
     [Authorize(Roles = "Admin")]
     [IgnoreAntiforgeryToken]
+    [ApiController]
     public class AdminController : Controller
     {
 

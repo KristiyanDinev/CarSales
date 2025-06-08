@@ -1,12 +1,9 @@
 using CarSales.Database;
 using CarSales.Models.Identity;
 using CarSales.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using System.Threading.RateLimiting;
 
 namespace CarSales
@@ -17,36 +14,16 @@ namespace CarSales
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            string _key = builder.Configuration.GetValue<string>("JWT:Key") ?? throw new Exception("No JWT Key provided.");
-            string _issuer = builder.Configuration.GetValue<string>("JWT:Issuer") ?? throw new Exception("No JWT Issuer provided.");
-            string _audience = builder.Configuration.GetValue<string>("JWT:Audience") ?? throw new Exception("No JWT Audience provided.");
-
-            builder.Services.AddTransient<JwtService>(_ =>
-                    new JwtService(_key, _issuer, _audience));
+            string connectionString = builder.Configuration.GetValue<string>("ConnectionString") ?? throw new Exception("No Connection String provided.");
 
             builder.Services.AddTransient<IEmailSender<IdentityUserModel>, EmailService>();
 
             builder.Services.AddControllersWithViews();
             builder.Services.AddDbContext<DatabaseContext>(options =>
-                options.UseMySQL(builder.Configuration.GetValue<string>("ConnectionString") ?? ""));
-
+                options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+            
+            builder.Services.AddAuthentication();
             builder.Services.AddAuthorization();
-            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(options =>
-            {
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = _issuer,
-                    ValidAudience = _audience,
-                    IssuerSigningKey = new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(_key))
-                };
-            });
-
 
             builder.Services.AddRateLimiter(_ => _
                 .AddFixedWindowLimiter(policyName: "fixed", options =>
@@ -77,10 +54,14 @@ namespace CarSales
             .AddEntityFrameworkStores<DatabaseContext>()
             .AddDefaultTokenProviders();
 
+
             builder.Services.ConfigureApplicationCookie(options =>
             {
+                // Cookie settings
+                options.Cookie.HttpOnly = true;
                 options.LoginPath = "/login";
                 options.LogoutPath = "/logout";
+                options.AccessDeniedPath = "/login";
             });
 
             builder.Services.AddSwaggerGen();
@@ -94,8 +75,8 @@ namespace CarSales
 
             app.UseRouting();
 
-            app.UseAuthorization();
             app.UseAuthentication();
+            app.UseAuthorization();
 
             using (var scope = app.Services.CreateScope())
             {
