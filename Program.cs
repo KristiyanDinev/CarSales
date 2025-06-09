@@ -50,6 +50,8 @@ namespace CarSales
                 options.User.RequireUniqueEmail = true;
                 options.SignIn.RequireConfirmedEmail = false;
                 options.SignIn.RequireConfirmedAccount = false;
+                options.SignIn.RequireConfirmedPhoneNumber = false;
+
             })
             .AddEntityFrameworkStores<DatabaseContext>()
             .AddDefaultTokenProviders();
@@ -80,51 +82,29 @@ namespace CarSales
 
             using (var scope = app.Services.CreateScope())
             {
-                await SeedRolesAndAdmin(scope.ServiceProvider);
-            }
+                UserManager<IdentityUserModel> userManager =
+                    scope.ServiceProvider.GetRequiredService<UserManager<IdentityUserModel>>();
 
-            app.MapControllers();
-            app.Run();
-        }
+                RoleManager<IdentityRoleModel> roleManager =
+                    scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRoleModel>>();
 
-        static async Task SeedRolesAndAdmin(IServiceProvider serviceProvider)
-        {
-            RoleManager<IdentityRoleModel> roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRoleModel>>();
-            UserManager<IdentityUserModel> userManager = serviceProvider.GetRequiredService<UserManager<IdentityUserModel>>();
-
-            string roleName = "Admin";
-            string userEmail = "admin@example.com";
-            string userPassword = "Admin123!";
-
-            // Create role if it doesn't exist
-            if (!await roleManager.RoleExistsAsync(roleName))
-            {
-                await roleManager.CreateAsync(new IdentityRoleModel(roleName));
-            }
-
-            // Create user if it doesn't exist
-            IdentityUserModel? user = await userManager.FindByEmailAsync(userEmail);
-            if (user == null)
-            {
-                user = new IdentityUserModel
+                string role = "Admin";
+                if (!(await roleManager.RoleExistsAsync(role)))
                 {
-                    UserName = userEmail,
-                    Email = userEmail,
-                    EmailConfirmed = true
-                };
+                    await roleManager.CreateAsync(new IdentityRoleModel { 
+                        Name = role,
+                        Description = "Gives access to the admin page."
+                    });
+                }
 
-                IdentityResult result = await userManager.CreateAsync(user, userPassword);
-                if (!result.Succeeded)
+                IdentityUserModel? user = await userManager.FindByEmailAsync("admin@example.com");
+                if (user != null)
                 {
-                    throw new Exception("Failed to create user: " + string.Join(", ", result.Errors.Select(e => e.Description)));
+                    await userManager.AddToRoleAsync(user, role);
                 }
             }
-
-            // Add user to role if not already added
-            if (!await userManager.IsInRoleAsync(user, roleName))
-            {
-                await userManager.AddToRoleAsync(user, roleName);
-            }
+            app.MapControllers();
+            app.Run();
         }
     }
 }

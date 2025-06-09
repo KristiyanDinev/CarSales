@@ -14,6 +14,11 @@ namespace CarSales.Models.Forms
         public required string Email { get; set; }
 
         [Required]
+        [Phone]
+        [Display(Name = "Phone")]
+        public required string PhoneNumber { get; set; }
+
+        [Required]
         [DataType(DataType.Password)]
         [Display(Name = "Password")]
         public required string Password { get; set; }

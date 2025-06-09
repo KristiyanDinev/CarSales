@@ -5,20 +5,18 @@ namespace CarSales.Models.Identity
     public class IdentityRoleModel : IdentityRole
     {
 
-        public string? Description { get; set; } = "No description provided.";
-        public override string? Name { get; set; }
+        public required string Description { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
 
-        public IdentityRoleModel() : base()
+        public IdentityRoleModel() : base("Default")
         {
             Name = "Default";
         }
 
         public IdentityRoleModel(string roleName) : base(roleName)
         {
-            this.Name = roleName;
+            Description = "No description provided.";
         }
-
     }
 }

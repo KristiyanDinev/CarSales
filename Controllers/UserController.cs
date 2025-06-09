@@ -1,12 +1,11 @@
 ﻿using CarSales.Models.Forms;
 using CarSales.Models.Identity;
-using CarSales.Services;
 using CarSales.Utilities;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.RateLimiting;
+using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace CarSales.Controllers
 {
@@ -58,15 +57,14 @@ namespace CarSales.Controllers
             IdentityUserModel user = new IdentityUserModel
             {
                 UserName = model.UserName,
-                Email = model.Email
+                Email = model.Email,
+                PhoneNumber = model.PhoneNumber
             };
 
             IdentityResult result = await _userManager.CreateAsync(user, model.Password);
 
             if (result.Succeeded)
             {
-                // Assign default role (optional)
-                //await _userManager.AddToRoleAsync(user, "User");
                 return Ok();
             }
 
@@ -95,8 +93,9 @@ namespace CarSales.Controllers
                 return Unauthorized();
             }
 
-            Microsoft.AspNetCore.Identity.SignInResult signInResult = await _signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, false);
-            if (signInResult.Succeeded)
+
+            SignInResult res = await _signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, lockoutOnFailure: false);
+            if (res.Succeeded)
             {
                 return Ok();
             }
