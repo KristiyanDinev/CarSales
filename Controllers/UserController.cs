@@ -69,7 +69,7 @@ namespace CarSales.Controllers
             }
 
             ModelStateDictionary ModelState1 = ModelState;
-            ErrorUtility.HandleModelErrors(result.Errors.Select(e => e.Description), ref ModelState1);
+            Utility.HandleModelErrors(result.Errors.Select(e => e.Description), ref ModelState1);
 
             return Unauthorized();
         }
@@ -89,7 +89,7 @@ namespace CarSales.Controllers
 
             IdentityUserModel? user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null) {
-                ErrorUtility.HandleModelErrors(errors, ref ModelState1);
+                Utility.HandleModelErrors(errors, ref ModelState1);
                 return Unauthorized();
             }
 
@@ -100,7 +100,7 @@ namespace CarSales.Controllers
                 return Ok();
             }
 
-            ErrorUtility.HandleModelErrors(errors, ref ModelState1);
+            Utility.HandleModelErrors(errors, ref ModelState1);
             return Unauthorized();
         }
 

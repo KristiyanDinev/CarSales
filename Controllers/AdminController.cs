@@ -17,7 +17,6 @@ namespace CarSales.Controllers
     [Authorize(Roles = "Admin")]
     [IgnoreAntiforgeryToken]
     [ApiController]
-    [Route("/admin")]
     public class AdminController : Controller
     {
         private readonly UserManager<IdentityUserModel> _userManager;
@@ -34,6 +33,7 @@ namespace CarSales.Controllers
 
 
         [HttpGet]
+        [Route("/admin")]
         public async Task<IActionResult> Index()
         {
             string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -62,7 +62,59 @@ namespace CarSales.Controllers
 
 
         [HttpPost]
-        [Route("/user/role/add")]
+        [Route("/admin/car/create")]
+        public async Task<IActionResult> CreateCar([FromForm] CreateCarFormModel createCarForm)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            if (createCarForm.Image == null || createCarForm.Image.Length == 0)
+            {
+                ModelState.AddModelError(string.Empty, "Image is required.");
+                return BadRequest();
+            }
+
+            if (!await _carService.CreateCarAsync(createCarForm))
+            {
+                ModelState.AddModelError(string.Empty, "Couldn't create that Car.");
+                return BadRequest();
+            }
+
+            TempData["SuccessStatus"] = "Created!";
+            return Ok();
+        }
+
+
+        [HttpPost]
+        [Route("/admin/car/edit")]
+        public async Task<IActionResult> EditCar([FromForm] CreateCarFormModel createCarForm)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            if (createCarForm.Id == null)
+            {
+                ModelState.AddModelError(string.Empty, "Id is required.");
+                return BadRequest();
+            }
+
+            if (!await _carService.EditCarAsync(createCarForm))
+            {
+                ModelState.AddModelError(string.Empty, "Couldn't edit that Car.");
+                return BadRequest();
+            }
+
+            return Ok();
+        }
+
+
+
+        [HttpPost]
+        [Route("/admin/user/role/add")]
         public async Task<IActionResult> AddRole([FromForm] UserRoleFormModel userAndRoleForm)
         {
             if (!ModelState.IsValid)
@@ -93,7 +145,7 @@ namespace CarSales.Controllers
 
 
         [HttpPost]
-        [Route("/user/role/remove")]
+        [Route("/admin/user/role/remove")]
         public async Task<IActionResult> RemoveRole([FromForm] UserRoleFormModel userAndRoleForm)
         {
             if (!ModelState.IsValid)
@@ -122,54 +174,5 @@ namespace CarSales.Controllers
             return BadRequest();
         }
 
-
-        [HttpPost]
-        [Route("/role/create")]
-        public async Task<IActionResult> CreateRole([FromForm] CreateRoleFormModel createRoleForm)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest();
-            }
-
-            IdentityResult result = await _roleManager.CreateAsync(
-                new IdentityRoleModel
-                {
-                    Name = createRoleForm.Role,
-                    Description = createRoleForm.Description ?? "No description provided."
-                });
-
-            if (result.Succeeded)
-            {
-                return Ok();
-            }
-
-            return BadRequest();
-        }
-
-
-        [HttpPost]
-        [Route("/role/delete")]
-        public async Task<IActionResult> DeleteRole([FromForm] string Name)
-        {
-            if (string.IsNullOrWhiteSpace(Name))
-            {
-                return BadRequest();
-            }
-
-            IdentityRoleModel? role = await _roleManager.FindByNameAsync(Name);
-            if (role == null)
-            {
-                return NotFound();
-            }
-
-            IdentityResult res = await _roleManager.DeleteAsync(role);
-            if (res.Succeeded)
-            {
-                return Ok();
-            }
-
-            return BadRequest();
-        }
     }
 }

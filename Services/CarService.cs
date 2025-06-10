@@ -2,6 +2,8 @@
 using CarSales.Enums;
 using CarSales.Models;
 using CarSales.Models.Database;
+using CarSales.Models.Forms;
+using CarSales.Utilities;
 using Microsoft.EntityFrameworkCore;
 
 namespace CarSales.Services
@@ -14,7 +16,6 @@ namespace CarSales.Services
         {
             _databasesContext = databasesContext;
         }
-
 
 
         public async Task<List<CarModel>> GetCarsAsync(CarQueryParameters parameters)
@@ -57,6 +58,64 @@ namespace CarSales.Services
                 .Take(parameters.PageSize);
 
             return await query.ToListAsync();
+        }
+
+        public async Task<bool> CreateCarAsync(CreateCarFormModel createCarForm)
+        {
+            if (createCarForm.Image == null)
+            {
+                return false;
+            }
+
+            string? imageUrl = await Utility.UploadCarImage(createCarForm.Image!);
+            if (imageUrl == null)
+            {
+                return false;
+            }
+
+            CarModel car = new CarModel
+            {
+                Make = createCarForm.Make,
+                Model = createCarForm.Model,
+                Year = createCarForm.Year,
+                Price = createCarForm.Price,
+                Description = createCarForm.Description,
+                Color = createCarForm.Color,
+                ImageUrl = imageUrl,
+            };
+
+            await _databasesContext.Cars.AddAsync(car);
+            return await _databasesContext.SaveChangesAsync() > 0;
+        }
+
+        public async Task<bool> EditCarAsync(CreateCarFormModel createCarForm)
+        {
+            CarModel? car = await _databasesContext.Cars
+                .FirstOrDefaultAsync(c => c.Id == createCarForm.Id);
+            if (car == null) { 
+                return false;
+            }
+
+            if (createCarForm.Image != null)
+            {
+                string? imageUrl = await Utility
+                    .UpdateCarImage(car.ImageUrl, createCarForm.Image);
+                if (imageUrl == null)
+                {
+                    return false;
+                }
+                car.ImageUrl = imageUrl;
+            }
+
+            car.Make = createCarForm.Make;
+            car.Model = createCarForm.Model;
+            car.Year = createCarForm.Year;
+            car.Price = createCarForm.Price;
+            car.Description = createCarForm.Description;
+            car.Color = createCarForm.Color;
+
+            _databasesContext.Cars.Update(car);
+            return await _databasesContext.SaveChangesAsync() > 0;
         }
     }
 }

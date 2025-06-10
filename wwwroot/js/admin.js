@@ -1,8 +1,24 @@
 ﻿
+function readURL(input) {
+    if (input.files && input.files[0]) {
+        var reader = new FileReader();
+
+        reader.onload = function (e) {
+            document.getElementById('carImagePreview').src = e.target.result
+        }
+
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
 function toggleForm() {
     document.getElementById("carFormContainer").style.display = "block";
     document.getElementById("formTitle").innerText = "Add New Car";
+    document.getElementById('carSave').onclick = function () { saveCar() };
     clearForm();
+    document.getElementById('carImage').onchange = (e) => {
+        readURL(e.target);
+    }
 }
 
 function cancelEdit() {
@@ -11,7 +27,6 @@ function cancelEdit() {
 }
 
 function clearForm() {
-    document.getElementById('carId').value = '';
     document.getElementById('carMake').value = '';
     document.getElementById('carModel').value = '';
     document.getElementById('carYear').value = '';
@@ -19,11 +34,70 @@ function clearForm() {
     document.getElementById('carColor').value = '';
     document.getElementById('carDescription').value = '';
     document.getElementById('carImage').value = '';
+    document.getElementById('carImagePreview').src = '';
 }
 
 
-async function editCar(carId) {
+function editCar(carId, Make, Model, Year, Price, Description, Color, Image) {
+    document.getElementById("carFormContainer").style.display = "block";
+    document.getElementById("formTitle").innerText = "Edit Car";
+    document.getElementById('carSave').onclick = function () { submitEditCar(carId) };
+    clearForm();
+    document.getElementById('carMake').value = Make;
+    document.getElementById('carModel').value = Model;
+    document.getElementById('carYear').value = Year;
+    document.getElementById('carPrice').value = Price;
+    document.getElementById('carColor').value = Color;
+    document.getElementById('carDescription').value = Description;
+    document.getElementById('carImage').value = '';
+    document.getElementById('carImagePreview').src = Image;
+}
+
+
+async function submitEditCar(carId) {
     if (!confirm("Are you sure you want to edit this car?")) return;
+
+    const make = document.getElementById('carMake').value
+    const model = document.getElementById('carModel').value
+    const year = document.getElementById('carYear').value
+    const price = document.getElementById('carPrice').value
+    const color = document.getElementById('carColor').value
+    const description = document.getElementById('carDescription').value
+    const ImageFile = document.getElementById('carImage').files[0]
+
+    if (!make || !model || !year || !price || !color ||
+        !description || !ImageFile || !carId) {
+        alert("Please fill all the inputs.");
+        return;
+    }
+
+    let formData = new FormData();
+    formData.append("Image", ImageFile);
+    formData.append("Make", make);
+    formData.append("Model", model);
+    formData.append("Year", year);
+    formData.append("Price", price);
+    formData.append("Color", color);
+    formData.append("Description", description);
+    formData.append("Id", carId);
+
+    try {
+        const response = await fetch('/admin/car/edit', {
+            method: 'POST',
+            body: formData
+        })
+
+        if (!response.ok) {
+            const errorText = await response.text()
+            alert(`Error: ${errorText} : ${response.status}`)
+            return
+        }
+
+        window.location.pathname = "/admin"
+
+    } catch {
+        return
+    }
 }
 
 
@@ -33,6 +107,45 @@ async function deleteCar(carId) {
 }
 
 async function saveCar() {
-    const image = document.getElementById('carImage').files[0];
-    if (image) formData.append("ImageFile", image);
+    const make = document.getElementById('carMake').value
+    const model = document.getElementById('carModel').value
+    const year = document.getElementById('carYear').value
+    const price = document.getElementById('carPrice').value
+    const color = document.getElementById('carColor').value
+    const description = document.getElementById('carDescription').value
+    const ImageFile = document.getElementById('carImage').files[0]
+
+    if (!make || !model || !year || !price || !color || !description || !ImageFile) {
+        alert("Please fill all the inputs.");
+        return;
+    }
+
+    let formData = new FormData();
+    formData.append("Image", ImageFile);
+    formData.append("Make", make);
+    formData.append("Model", model);
+    formData.append("Year", year);
+    formData.append("Price", price);
+    formData.append("Color", color);
+    formData.append("Description", description);
+    formData.append("Id", '');
+
+    try {
+
+        const response = await fetch('/admin/car/create', {
+            method: 'POST',
+            body: formData
+        })
+
+        if (!response.ok) {
+            const errorText = await response.text()
+            alert(`Error: ${errorText} : ${response.status}`)
+            return
+        }
+
+        window.location.pathname = "/admin"
+
+    } catch {
+        return
+    }
 }

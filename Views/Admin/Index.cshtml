@@ -14,43 +14,91 @@
         <div class="text-center mb-4">
             <h1>Admin Page</h1>
             @await Html.PartialAsync("_User", Model.User)
-            <button class="btn btn-success mt-3" onclick="toggleForm()">Add New Car</button>
+            <button class="btn btn-success mt-2" onclick="toggleForm()">Add New Car</button>
+
+            @if (TempData["SuccessStatus"] != null)
+            {
+                <p class="alert alert-success mt-2">@TempData["SuccessStatus"]</p>
+            }
+
+            @await Html.PartialAsync("_ShowErrors")
         </div>
 
-        <!-- Car Form Section (hidden by default) -->
-        <div id="carFormContainer" class="border p-4 rounded mb-4" style="display:none;">
+        <div id="carFormContainer" class="border p-4 rounded mb-4 was-validated" style="display:none;" novalidate>
             <h3 id="formTitle">Add New Car</h3>
-            <input type="hidden" id="carId" />
             <div class="form-group">
-                <label>Make</label>
+                <label class="form-label" for="carMake">Make</label>
                 <input type="text" class="form-control" id="carMake" required />
+                <div class="valid-feedback">
+                    Check!
+                </div>
+                <div class="invalid-feedback">
+                    Please specify a Make.
+                </div>
             </div>
             <div class="form-group">
-                <label>Model</label>
+                <label class="form-label" for="carModel">Model</label>
                 <input type="text" class="form-control" id="carModel" required />
+                <div class="valid-feedback">
+                    Check!
+                </div>
+                <div class="invalid-feedback">
+                    Please specify a Model.
+                </div>
             </div>
             <div class="form-group">
-                <label>Year</label>
-                <input type="number" class="form-control" id="carYear" min="1900" max="2099" />
+                <label class="form-label" for="carYear">Year</label>
+                <input type="number" class="form-control" id="carYear" min="1000" max="2999" required/>
+                <div class="valid-feedback">
+                    Check!
+                </div>
+                <div class="invalid-feedback">
+                    Please specify a Year.
+                </div>
             </div>
             <div class="form-group">
-                <label>Price</label>
-                <input type="number" step="0.01" class="form-control" id="carPrice" />
+                <label class="form-label" for="carPrice">Price</label>
+                <input type="number" step="0.01" class="form-control" id="carPrice" required />
+                <div class="valid-feedback">
+                    Check!
+                </div>
+                <div class="invalid-feedback">
+                    Please specify a Price.
+                </div>
             </div>
             <div class="form-group">
-                <label>Color</label>
-                <input type="text" class="form-control" id="carColor" />
+                <label class="form-label" for="carColor">Color</label>
+                <input type="text" class="form-control" id="carColor" required />
+                <div class="valid-feedback">
+                    Check!
+                </div>
+                <div class="invalid-feedback">
+                    Please specify a Color.
+                </div>
             </div>
             <div class="form-group">
-                <label>Description</label>
-                <textarea class="form-control" id="carDescription"></textarea>
+                <label class="form-label" for="carDescription">Description</label>
+                <textarea class="form-control" id="carDescription" required></textarea>
+                <div class="valid-feedback">
+                    Check!
+                </div>
+                <div class="invalid-feedback">
+                    Please specify a Description.
+                </div>
             </div>
             <div class="form-group">
-                <label>Image</label>
-                <input type="file" class="form-control-file" id="carImage" />
+                <label class="form-label" for="carImage">Image</label>
+                <input type="file" class="form-control" id="carImage" required />
+                <div class="valid-feedback">
+                    Check!
+                </div>
+                <div class="invalid-feedback">
+                    Please specify a Image.
+                </div>
+                <img class="img-thumbnail rounded" src="" alt="Image Preview" id="carImagePreview" />
             </div>
-            <button class="btn btn-primary" onclick="saveCar()">Save</button>
-            <button class="btn btn-secondary" onclick="cancelEdit()">Cancel</button>
+            <button class="mt-3 btn btn-primary" onclick="saveCar()" id="carSave">Save</button>
+            <button class="mt-3 btn btn-secondary" onclick="cancelEdit()">Cancel</button>
         </div>
 
         <div class="table-responsive">
@@ -84,8 +132,8 @@
                             <td>@car.Price</td>
                             <td>
                                 <a class="btn btn-primary btn-sm" href="/car/@car.Id">View</a>
-                                <button class="btn btn-warning btn-sm" onclick="editCar(@car.Id)">Edit</button>
-                                <button class="btn btn-danger btn-sm" onclick="deleteCar(@car.Id)">Delete</button>
+                                <button class="btn btn-warning btn-sm" onclick="editCar(@car.Id, '@car.Make', '@car.Model', @car.Year, '@car.Price', '@car.Description', '@car.Color', '@car.ImageUrl')">Edit</button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteCar(@car.Id, '@car.Make', '@car.Model', @car.Year, '@car.Price', '@car.Description', '@car.Color', '@car.ImageUrl')">Delete</button>
                             </td>
                         </tr>
                     }

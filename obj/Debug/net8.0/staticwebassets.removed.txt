@@ -1,2 +1,1 @@
-D:\Projects\CarSales\wwwroot\images\bg.jpg
-D:\Projects\CarSales\wwwroot\css\home.css
+D:\Projects\CarSales\wwwroot\images\cars\0.png
