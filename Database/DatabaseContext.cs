@@ -61,7 +61,12 @@ namespace CarSales.Database
             modelBuilder.Entity<CarModel>()
                 .Property(c => c.ImageUrl)
                 .HasMaxLength(200);
-        }
 
+            modelBuilder.Entity<CarModel>()
+                .Property(c => c.CreatedAt)
+                .HasColumnType("datetime")
+                .HasDefaultValueSql("NOW()")
+                .ValueGeneratedOnAdd();
+        }
     }
 }

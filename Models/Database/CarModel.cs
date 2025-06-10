@@ -3,12 +3,13 @@
     public class CarModel
     {
         public int Id { get; set; }
-        public string Make { get; set; } = string.Empty;
-        public string Model { get; set; } = string.Empty;
-        public int Year { get; set; }
-        public decimal Price { get; set; }
-        public string Color { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-        public string ImageUrl { get; set; } = string.Empty;
+        public required string Make { get; set; }
+        public required string Model { get; set; }
+        public required int Year { get; set; }
+        public required decimal Price { get; set; }
+        public required string Color { get; set; } 
+        public required string Description { get; set; } 
+        public required string ImageUrl { get; set; }
+        public DateTime CreatedAt { get; set; }
     }
 }

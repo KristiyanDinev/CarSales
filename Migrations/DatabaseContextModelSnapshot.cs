@@ -35,6 +35,11 @@ namespace CarSales.Migrations
                         .HasMaxLength(30)
                         .HasColumnType("varchar(30)");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasDefaultValueSql("NOW()");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(500)

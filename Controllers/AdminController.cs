@@ -1,5 +1,9 @@
-﻿using CarSales.Models.Forms;
+﻿using CarSales.Enums;
+using CarSales.Models;
+using CarSales.Models.Forms;
 using CarSales.Models.Identity;
+using CarSales.Models.Views.Admin;
+using CarSales.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -18,11 +22,14 @@ namespace CarSales.Controllers
     {
         private readonly UserManager<IdentityUserModel> _userManager;
         private readonly RoleManager<IdentityRoleModel> _roleManager;
+        private readonly CarService _carService;
 
         public AdminController(UserManager<IdentityUserModel> userManager, 
-            RoleManager<IdentityRoleModel> roleManager) {
+            RoleManager<IdentityRoleModel> roleManager, 
+            CarService carService) {
             _userManager = userManager;
             _roleManager = roleManager;
+            _carService = carService;
         }
 
 
@@ -43,7 +50,14 @@ namespace CarSales.Controllers
                 return Unauthorized();
             }
 
-            return View();
+            return View(new AdminHomeViewModel {
+                Cars = await _carService.GetCarsAsync(new CarQueryParameters
+                {
+                    SortBy = CarSortEnum.CreatedAt,
+                    SortDescending = true
+                }),
+                User = currentUser
+            });
         }
 
 

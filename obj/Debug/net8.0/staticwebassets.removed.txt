@@ -1,0 +1,2 @@
+D:\Projects\CarSales\wwwroot\images\bg.jpg
+D:\Projects\CarSales\wwwroot\css\home.css

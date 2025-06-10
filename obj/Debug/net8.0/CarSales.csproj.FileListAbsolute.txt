@@ -120,3 +120,4 @@ D:\Projects\CarSales\obj\Debug\net8.0\refint\CarSales.dll
 D:\Projects\CarSales\obj\Debug\net8.0\CarSales.pdb
 D:\Projects\CarSales\obj\Debug\net8.0\CarSales.genruntimeconfig.cache
 D:\Projects\CarSales\obj\Debug\net8.0\ref\CarSales.dll
+D:\Projects\CarSales\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

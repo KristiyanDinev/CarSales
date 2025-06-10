@@ -17,6 +17,7 @@ namespace CarSales
             string connectionString = builder.Configuration.GetValue<string>("ConnectionString") ?? throw new Exception("No Connection String provided.");
 
             builder.Services.AddTransient<IEmailSender<IdentityUserModel>, EmailService>();
+            builder.Services.AddScoped<CarService>();
 
             builder.Services.AddControllersWithViews();
             builder.Services.AddDbContext<DatabaseContext>(options =>
@@ -51,7 +52,6 @@ namespace CarSales
                 options.SignIn.RequireConfirmedEmail = false;
                 options.SignIn.RequireConfirmedAccount = false;
                 options.SignIn.RequireConfirmedPhoneNumber = false;
-
             })
             .AddEntityFrameworkStores<DatabaseContext>()
             .AddDefaultTokenProviders();
@@ -64,6 +64,10 @@ namespace CarSales
                 options.LoginPath = "/login";
                 options.LogoutPath = "/logout";
                 options.AccessDeniedPath = "/login";
+                options.SlidingExpiration = true;
+                options.ExpireTimeSpan = TimeSpan.FromDays(3);
+                options.Cookie.Name = "Authentication";
+                options.ReturnUrlParameter = string.Empty;
             });
 
             builder.Services.AddSwaggerGen();
@@ -97,10 +101,17 @@ namespace CarSales
                     });
                 }
 
-                IdentityUserModel? user = await userManager.FindByEmailAsync("admin@example.com");
-                if (user != null)
+                IdentityUserModel admin = new IdentityUserModel
                 {
-                    await userManager.AddToRoleAsync(user, role);
+                    UserName = "Admin",
+                    Email = "admin@example.com",
+                    PhoneNumber = "08123141254"
+                };
+
+                IdentityResult res = await userManager.CreateAsync(admin, "Admin123!");
+                if (res.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(admin, role);
                 }
             }
             app.MapControllers();
