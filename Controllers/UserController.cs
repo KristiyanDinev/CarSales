@@ -61,6 +61,14 @@ namespace CarSales.Controllers
             IdentityResult result = await _userManager.CreateAsync(user, model.Password);
             if (result.Succeeded)
             {
+                SignInResult loginResult = await _signInManager.PasswordSignInAsync(user, model.Password, false, lockoutOnFailure: false);
+                if (!result.Succeeded)
+                {
+                    await _userManager.DeleteAsync(user);
+                    TempData["Error"] = "Unable to register.";
+                    return Unauthorized();
+                }
+
                 TempData["Success"] = "Registration successful!";
                 return Ok();
             }

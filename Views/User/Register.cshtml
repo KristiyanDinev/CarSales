@@ -9,7 +9,6 @@
 
     @await Html.PartialAsync("_Imports")
 
-    <script src="~/js/register.js"></script>
 </head>
 
 
@@ -54,7 +53,7 @@
                     <div class="input-group">
                         <i class="bi bi-lock-fill input-group-text"></i>
                         <input type="password" class="form-control" id="Password" placeholder="Password">
-                        <i class="bi bi-eye input-group-text clickable" id="togglePassword"></i>
+                        <i class="bi bi-eye input-group-text clickable" id="togglePassword" style="cursor: pointer;"></i>
                     </div>
                 </div>
 
@@ -63,7 +62,7 @@
                     <div class="input-group">
                         <i class="bi bi-lock-fill input-group-text"></i>
                         <input type="password" class="form-control" id="ConfirmPassword" placeholder="Confirm Password">
-                        <i class="bi bi-eye input-group-text" id="togglePassword1"></i>
+                        <i class="bi bi-eye input-group-text" id="togglePassword1" style="cursor: pointer;"></i>
                     </div>
                 </div>
 

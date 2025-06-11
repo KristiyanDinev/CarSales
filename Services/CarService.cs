@@ -18,7 +18,7 @@ namespace CarSales.Services
         }
 
 
-        public async Task<List<CarModel>> GetCarsAsync(CarQueryParameters parameters)
+        public async Task<List<CarModel>> GetCarsAsync(CarQueryParametersModel parameters)
         {
             IQueryable<CarModel> query = _databasesContext.Cars.AsQueryable();
 
@@ -27,13 +27,13 @@ namespace CarSales.Services
                 query = query.Where(c => c.Make == parameters.Make);
             }
 
-            if (parameters.MinPrice.HasValue)
+            if (parameters.Pirce.HasValue)
             {
-                query = query.Where(c => c.Price >= parameters.MinPrice.Value);
+                query = query.Where(c => c.Price == parameters.Pirce);
             }
 
-            if (parameters.MaxPrice.HasValue) {
-                query = query.Where(c => c.Price <= parameters.MaxPrice.Value);
+            if (parameters.Model != null) {
+                query = query.Where(c => c.Model == parameters.Model);
             }
 
             if (parameters.Year.HasValue)
@@ -54,8 +54,8 @@ namespace CarSales.Services
 
             // Paging
             query = query
-                .Skip((parameters.PageNumber - 1) * parameters.PageSize)
-                .Take(parameters.PageSize);
+                .Skip((parameters.Page - 1) * Utility.pageSize)
+                .Take(Utility.pageSize);
 
             return await query.ToListAsync();
         }
@@ -118,11 +118,10 @@ namespace CarSales.Services
             return await _databasesContext.SaveChangesAsync() > 0;
         }
 
-
         public async Task<bool> DeleteCarAsync(int id)
         {
             CarModel? car = await _databasesContext.Cars.FirstOrDefaultAsync(c => c.Id == id);
-            if (car == null)
+            if (car == null || !Utility.DeleteImage(car.ImageUrl))
             {
                 return false;
             }

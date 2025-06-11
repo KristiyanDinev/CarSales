@@ -1,4 +1,4 @@
-﻿@using CarSales.Models.Database;
+﻿@using CarSales.Models;
 @model CarSales.Models.Views.Admin.AdminHomeViewModel;
 @{
     ViewData["Title"] = "Admin Users";
@@ -11,7 +11,61 @@
 
 
 <body>
-
+    <div class="container mt-5">
     @await Html.PartialAsync("_AdminPanel", Model.User)
+
+    <div class="container m-2 justify-content-center text-center">
+            @if (Model.CurrentPage > 1)
+            {
+                // move forward and backword
+                <button onclick="page(@(Model.CurrentPage - 1))" class="btn btn-info btn-sm">⏪ Page <b>@(Model.CurrentPage - 1)</b></button>
+                <button class="btn btn-primary btn-sm" disabled>Current Page <b>@Model.CurrentPage</b></button>
+                <button onclick="page(@(Model.CurrentPage + 1))" class="btn btn-info btn-sm">Page <b>@(Model.CurrentPage + 1)</b> ⏩</button>
+            }
+            else
+            {
+                // move only forward
+                <button onclick="page(@(Model.CurrentPage + 1))" class="btn btn-info btn-sm">Page <b>@(Model.CurrentPage + 1)</b> ⏩</button>
+            }
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped text-center">
+            <thead class="thead-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone Number</th>
+                    <th>IsAdmin?</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (UserViewAdminModel userView in Model.Users)
+                {
+                    <tr id="user-row-@userView.User.Id">
+                        <td>@userView.User.Id</td>
+                        <td>@userView.User.UserName</td>
+                        <td>@userView.User.Email</td>
+                        <td>@userView.User.PhoneNumber</td>
+                        <td>
+                            <div class="form-check">
+                                <label for="IsAdmin" class="form-check-label">IsAdmin?</label>
+                                @if (userView.IsAdmin)
+                                {
+                                    <input onclick="toggleUserAdmin('@userView.User.UserName', '@userView.User.Id', false)" type="checkbox" id="IsAdmin" class="form-check-input" checked>
+
+                                } else
+                                {
+                                    <input onclick="toggleUserAdmin('@userView.User.UserName', '@userView.User.Id', true)" type="checkbox" id="IsAdmin" class="form-check-input">
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    </div>
 
 </body>

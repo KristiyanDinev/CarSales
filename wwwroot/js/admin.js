@@ -87,7 +87,7 @@ async function submitEditCar(carId) {
             body: formData
         })
 
-        window.location.pathname = "/admin/cars"
+        window.location.reload()
 
     } catch {
         return
@@ -104,7 +104,7 @@ async function deleteCar(carId) {
             method: 'POST'
         })
 
-        window.location.pathname = "/admin/cars"
+        window.location.reload()
 
     } catch {
         return
@@ -141,9 +141,45 @@ async function saveCar() {
             body: formData
         })
 
-        window.location.pathname = "/admin"
+        window.location.reload()
 
     } catch {
         return
     }
+}
+
+
+
+async function toggleUserAdmin(username, userId, isAdmin) {
+    if (!confirm(`Are you sure you want to ${isAdmin ? 'give admin to' : 'remove admin from'} ${username}`)) return;
+
+    let formData = new FormData();
+    formData.append("UserId", userId);
+    formData.append("IsAdmin", isAdmin);
+
+    try {
+        await fetch(`/admin/user/role`, {
+            method: 'POST',
+            body: formData
+        })
+
+        window.location.reload()
+
+    } catch (error) {
+        return
+    }
+}
+
+
+function page(pageNumber) {
+    let elements = document.getElementsByClassName("car-row")
+    if (elements.length < 10) {
+        alert("You are already on the last page.")
+        return
+    }
+    const params = new URLSearchParams({
+        page: pageNumber
+    })
+
+    window.location.href = window.location.pathname + `?${params.toString()}`
 }

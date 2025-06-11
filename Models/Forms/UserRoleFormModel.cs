@@ -2,7 +2,7 @@
 {
     public class UserRoleFormModel
     {
-        public required string Email { get; set; }
-        public required string Role { get; set; }
+        public required string UserId { get; set; }
+        public required bool IsAdmin { get; set; }
     }
 }

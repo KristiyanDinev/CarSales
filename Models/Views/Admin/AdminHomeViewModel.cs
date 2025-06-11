@@ -7,6 +7,7 @@ namespace CarSales.Models.Views.Admin
     {
         public required IdentityUserModel User { get; set; }
         public List<CarModel> Cars { get; set; } = new List<CarModel>();
-        public List<IdentityUserModel> Users { get; set; } = new List<IdentityUserModel>();
+        public List<UserViewAdminModel> Users { get; set; } = new List<UserViewAdminModel>();
+        public required int CurrentPage { get; set; } = 1;
     }
 }

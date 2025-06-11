@@ -57,7 +57,7 @@ namespace CarSales.Controllers
                 return Unauthorized();
             }
 
-            return View(currentUser);
+            return View();
         }
     }
 }

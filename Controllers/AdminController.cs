@@ -1,10 +1,9 @@
-﻿using CarSales.Enums;
-using CarSales.Models;
-using CarSales.Models.Database;
+﻿using CarSales.Models;
 using CarSales.Models.Forms;
 using CarSales.Models.Identity;
 using CarSales.Models.Views.Admin;
 using CarSales.Services;
+using CarSales.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -20,6 +19,7 @@ namespace CarSales.Controllers
     [ApiController]
     public class AdminController : Controller
     {
+        private static readonly string AdminRoleName = "Admin";
         private readonly UserManager<IdentityUserModel> _userManager;
         private readonly RoleManager<IdentityRoleModel> _roleManager;
         private readonly CarService _carService;
@@ -36,7 +36,7 @@ namespace CarSales.Controllers
         [HttpGet]
         [Route("/admin")]
         [Route("/admin/cars")]
-        public async Task<IActionResult> Cars()
+        public async Task<IActionResult> Cars([FromQuery] CarQueryParametersModel carQuery)
         {
             string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null)
@@ -52,19 +52,16 @@ namespace CarSales.Controllers
 
             return View(new AdminHomeViewModel
             {
-                Cars = await _carService.GetCarsAsync(new CarQueryParameters
-                {
-                    SortBy = CarSortEnum.CreatedAt,
-                    SortDescending = true
-                }),
-                User = currentUser
+                Cars = await _carService.GetCarsAsync(carQuery),
+                User = currentUser,
+                CurrentPage = carQuery.Page
             });
         }
 
 
         [HttpGet]
         [Route("/admin/users")]
-        public async Task<IActionResult> Users()
+        public async Task<IActionResult> Users([FromQuery] int Page = 1)
         {
             string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null)
@@ -78,10 +75,25 @@ namespace CarSales.Controllers
                 return Unauthorized();
             }
 
+            List<UserViewAdminModel> usersView = new List<UserViewAdminModel>();
+
+            foreach (IdentityUserModel user in 
+
+                await Utility.GetPageAsync<IdentityUserModel>(_userManager.Users
+                     .Where(u => u.Id != currentUser.Id), Page))
+            {
+                usersView.Add(new UserViewAdminModel
+                {
+                    User = user,
+                    IsAdmin = await _userManager.IsInRoleAsync(user, AdminRoleName)
+                });
+            }
+
             return View(new AdminHomeViewModel
             {
                 User = currentUser,
-                Users = new List<IdentityUserModel>()
+                Users = usersView,
+                CurrentPage = Page
             });
         }
 
@@ -92,23 +104,23 @@ namespace CarSales.Controllers
         {
             if (!ModelState.IsValid)
             {
-                ModelState.AddModelError(string.Empty, "Invalid Model.");
+                TempData["Error"] = "Invalid Model.";
                 return BadRequest();
             }
 
             if (createCarForm.Image == null || createCarForm.Image.Length == 0)
             {
-                ModelState.AddModelError(string.Empty, "Image is required.");
+                TempData["Error"] = "Image is required.";
                 return BadRequest();
             }
 
             if (!await _carService.CreateCarAsync(createCarForm))
             {
-                ModelState.AddModelError(string.Empty, "Couldn't create that Car.");
+                TempData["Error"] = "Couldn't create that Car.";
                 return BadRequest();
             }
 
-            TempData["SuccessStatus"] = "Created!";
+            TempData["Success"] = "Created!";
             return Ok();
         }
 
@@ -119,23 +131,23 @@ namespace CarSales.Controllers
         {
             if (!ModelState.IsValid)
             {
-                ModelState.AddModelError(string.Empty, "Invalid Model.");
+                TempData["Error"] = "Invalid Model.";
                 return BadRequest();
             }
 
             if (createCarForm.Id == null)
             {
-                ModelState.AddModelError(string.Empty, "Id is required.");
+                TempData["Error"] = "Id is required.";
                 return BadRequest();
             }
 
             if (!await _carService.EditCarAsync(createCarForm))
             {
-                ModelState.AddModelError(string.Empty, "Couldn't edit that Car.");
+                TempData["Error"] = "Couldn't edit that Car.";
                 return BadRequest();
             }
 
-            TempData["SuccessStatus"] = "Edited!";
+            TempData["Success"] = "Edited!";
             return Ok();
         }
 
@@ -146,75 +158,61 @@ namespace CarSales.Controllers
         {
             if (!await _carService.DeleteCarAsync(id))
             {
-                ModelState.AddModelError(string.Empty, "Couldn't delete Car.");
+                TempData["Error"] = "Couldn't delete Car.";
                 return BadRequest();
             }
 
-            TempData["SuccessStatus"] = "Deleted!";
+            TempData["SuccessS"] = "Deleted!";
             return Ok();
         }
 
 
         [HttpPost]
-        [Route("/admin/user/role/add")]
-        public async Task<IActionResult> AddRole([FromForm] UserRoleFormModel userAndRoleForm)
+        [Route("/admin/user/role")]
+        public async Task<IActionResult> ManagerRole([FromForm] UserRoleFormModel userAndRoleForm)
         {
             if (!ModelState.IsValid)
             {
+                TempData["Error"] = "Invalid Data.";
                 return BadRequest();
             }
 
-            IdentityRoleModel? role = await _roleManager.FindByNameAsync(userAndRoleForm.Role);
+            IdentityRoleModel? role = await _roleManager.FindByNameAsync(AdminRoleName);
             if (role == null)
             {
-                return BadRequest();
+                TempData["Error"] = "Role not found.";
+                return NotFound();
             }
 
-            IdentityUserModel? user = await _userManager.FindByEmailAsync(userAndRoleForm.Email);
+            IdentityUserModel? user = await _userManager.FindByIdAsync(userAndRoleForm.UserId);
             if (user == null)
             {
-                return BadRequest();
+                TempData["Error"] = "User not found.";
+                return NotFound();
             }
 
-            IdentityResult result = await _userManager.AddToRoleAsync(user, userAndRoleForm.Role);
+            IdentityResult result;
+            if (userAndRoleForm.IsAdmin)
+            {
+                result = await _userManager.AddToRoleAsync(user, AdminRoleName);
+
+            } else
+            {
+                result = await _userManager.RemoveFromRoleAsync(user, AdminRoleName);
+            }
+
             if (result.Succeeded)
             {
+                TempData["Success"] = userAndRoleForm.IsAdmin ? 
+                    $"Added Admin Role for {user.Email}" : 
+                    $"Removed Admin Role for {user.Email}";
                 return Ok();
             }
 
+            TempData["Error"] = userAndRoleForm.IsAdmin ? 
+                $"Couldn't add Admin Role for {user.Email}" : 
+                $"Couldn't remove Admin Role for {user.Email}";
             return BadRequest();
         }
-
-
-        [HttpPost]
-        [Route("/admin/user/role/remove")]
-        public async Task<IActionResult> RemoveRole([FromForm] UserRoleFormModel userAndRoleForm)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest();
-            }
-
-            IdentityRoleModel? role = await _roleManager.FindByNameAsync(userAndRoleForm.Role);
-            if (role == null)
-            {
-                return BadRequest();
-            }
-
-            IdentityUserModel? user = await _userManager.FindByEmailAsync(userAndRoleForm.Email);
-            if (user == null)
-            {
-                return BadRequest();
-            }
-
-            IdentityResult result = await _userManager.RemoveFromRoleAsync(user, userAndRoleForm.Role);
-            if (result.Succeeded)
-            {
-                return Ok();
-            }
-
-            return BadRequest();
-        }
-
     }
 }

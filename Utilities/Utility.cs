@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace CarSales.Utilities
 {
     public class Utility
     {
+        public static int pageSize = 10;
+
         public static async Task<string?> UploadCarImage(IFormFile Image)
         {
             if (Image == null || Image.Length == 0)
@@ -83,5 +85,32 @@ namespace CarSales.Utilities
                 return null;
             }
         }
+
+        public static bool DeleteImage(string imagePath)
+        {
+            string fullPath = Path.Combine("wwwroot", imagePath.TrimStart('/'));
+            try
+            {
+                if (Path.Exists(fullPath))
+                {
+                    // Delete the image file
+                    File.Delete(fullPath);
+                }
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        public static async Task<List<T>> GetPageAsync<T>(IQueryable<T> query, int pageNumber)
+        {
+            return await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
     }
 }
