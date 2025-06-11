@@ -1,0 +1,17 @@
+﻿@using CarSales.Models.Database;
+@model CarSales.Models.Views.Admin.AdminHomeViewModel;
+@{
+    ViewData["Title"] = "Admin Users";
+}
+
+<head>
+    @await Html.PartialAsync("_Imports")
+    <script src="~/js/admin.js"></script>
+</head>
+
+
+<body>
+
+    @await Html.PartialAsync("_AdminPanel", Model.User)
+
+</body>

@@ -1,7 +1,7 @@
 ﻿@model CarSales.Models.Identity.IdentityUserModel;
 
 @{
-     ViewData["Title"] = "Login";
+    ViewData["Title"] = "Login";
 }
 
 
@@ -9,33 +9,50 @@
 
     @await Html.PartialAsync("_Imports")
 
-    <link rel="stylesheet" href="~/css/login.css" />
-    <script src="~/js/login.js"></script>
 
 </head>
 
 <body>
-    <div class="wrapper">
-        <div class="title"><span>Login Form</span></div>
 
-        <div class="form">
-            @await Html.PartialAsync("_ShowErrors")
-            <div class="row">
-                <i class="fas fa-envelope"></i>
-                <input type="email" placeholder="Email" id="Email" required />
+    <div class="container login-container d-flex align-items-center justify-content-center">
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow-sm p-4">
+                <h3 class="text-center m-4">Login</h3>
+
+                @await Html.PartialAsync("_ShowError")
+
+                <div class="form-group m-2">
+                    <label for="Email" class="form-label">Email address</label>
+
+                    <div class="input-group">
+                        <i class="bi bi-envelope-at-fill input-group-text"></i>
+                        <input type="email" class="form-control" id="Email" placeholder="john@email.com">
+                    </div>
+                </div>
+
+                <div class="form-group m-2">
+                    <label for="Password" class="form-label">Password</label>
+                    <div class="input-group">
+                        <i class="bi bi-lock-fill input-group-text"></i>
+                        <input type="password" class="form-control" id="Password" placeholder="Password">
+                        <i class="bi bi-eye input-group-text" id="togglePassword"></i>
+                    </div>
+                </div>
+
+                <div class="form-group form-check m-2">
+                    <input type="checkbox" id="RememberMe" class="form-check-input">
+                    <label for="RememberMe" class="form-check-label">Remember me</label>
+                </div>
+
+                <button class="btn btn-primary btn-block" onclick="login()">Login</button>
+
+                <div class="text-center mt-3">
+                    Don't have an account?
+                    <a href="/register">Register</a>
+                </div>
             </div>
-            <div class="row">
-                <i class="fas fa-lock"></i>
-                <input type="password" placeholder="Password" id="Password" required />
-            </div>
-            <div class="form-check">
-                <input type="checkbox" class="form-check-input" id="RememberMe">
-                <label class="form-check-label" for="RememberMe">Remember Me?</label>
-            </div>
-            <div class="row button">
-                <input type="button" onclick="login()" value="Login" />
-            </div>
-            <div class="signup-link">Don't have an account? <a href="/register">Register now</a></div>
         </div>
     </div>
+
+    <script src="~/js/login.js"></script>
 </body>

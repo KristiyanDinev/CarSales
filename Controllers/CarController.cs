@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using CarSales.Models.Identity;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using System.Security.Claims;
 
 namespace CarSales.Controllers
 {
@@ -11,23 +14,50 @@ namespace CarSales.Controllers
     [ApiController]
     public class CarController : Controller
     {
+        private readonly UserManager<IdentityUserModel> _userManager;
 
-        public CarController() { }
+        public CarController(UserManager<IdentityUserModel> userManager) {
+            _userManager = userManager;
+        }
 
 
         [HttpGet]
         [Route("/cars")]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            IdentityUserModel? currentUser = await _userManager.FindByIdAsync(userId);
+            if (currentUser == null)
+            {
+                return Unauthorized();
+            }
+
+            return View(currentUser);
         }
 
 
         [HttpGet]
         [Route("/car/{id}")]
-        public IActionResult Car(int id)
+        public async Task<IActionResult> Car(int id)
         {
-            return View();
+            string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            IdentityUserModel? currentUser = await _userManager.FindByIdAsync(userId);
+            if (currentUser == null)
+            {
+                return Unauthorized();
+            }
+
+            return View(currentUser);
         }
     }
 }

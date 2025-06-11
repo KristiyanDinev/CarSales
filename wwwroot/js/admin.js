@@ -17,7 +17,7 @@ function toggleForm() {
     document.getElementById('carSave').onclick = function () { saveCar() };
     clearForm();
     document.getElementById('carImage').onchange = (e) => {
-        readURL(e.target);
+        readURL(e.target); 
     }
 }
 
@@ -66,7 +66,7 @@ async function submitEditCar(carId) {
     const ImageFile = document.getElementById('carImage').files[0]
 
     if (!make || !model || !year || !price || !color ||
-        !description || !ImageFile || !carId) {
+        !description || !carId) {
         alert("Please fill all the inputs.");
         return;
     }
@@ -82,18 +82,12 @@ async function submitEditCar(carId) {
     formData.append("Id", carId);
 
     try {
-        const response = await fetch('/admin/car/edit', {
+        await fetch('/admin/car/edit', {
             method: 'POST',
             body: formData
         })
 
-        if (!response.ok) {
-            const errorText = await response.text()
-            alert(`Error: ${errorText} : ${response.status}`)
-            return
-        }
-
-        window.location.pathname = "/admin"
+        window.location.pathname = "/admin/cars"
 
     } catch {
         return
@@ -104,6 +98,17 @@ async function submitEditCar(carId) {
 async function deleteCar(carId) {
     if (!confirm("Are you sure you want to delete this car?")) return;
 
+
+    try {
+        await fetch("/admin/car/delete/" + carId, {
+            method: 'POST'
+        })
+
+        window.location.pathname = "/admin/cars"
+
+    } catch {
+        return
+    }
 }
 
 async function saveCar() {
@@ -131,17 +136,10 @@ async function saveCar() {
     formData.append("Id", '');
 
     try {
-
-        const response = await fetch('/admin/car/create', {
+        await fetch('/admin/car/create', {
             method: 'POST',
             body: formData
         })
-
-        if (!response.ok) {
-            const errorText = await response.text()
-            alert(`Error: ${errorText} : ${response.status}`)
-            return
-        }
 
         window.location.pathname = "/admin"
 

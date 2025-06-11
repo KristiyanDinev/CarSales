@@ -1,4 +1,14 @@
 ﻿
+const toggle = document.getElementById('togglePassword');
+const passwordInput = document.getElementById('Password');
+
+toggle.addEventListener('click', function () {
+    const type = passwordInput.type === 'password' ? 'text' : 'password';
+    passwordInput.type = type;
+    this.classList.toggle('bi-eye-slash');
+    this.classList.toggle('bi-eye');
+});
+
 
 async function login() {
     const formData = new FormData();
@@ -16,7 +26,7 @@ async function login() {
             window.location.pathname = "/cars"
 
         } else {
-            window.location.reload()
+            window.location.reload();
         }
 
     } catch (error) {

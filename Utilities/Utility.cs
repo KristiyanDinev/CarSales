@@ -4,15 +4,6 @@ namespace CarSales.Utilities
 {
     public class Utility
     {
-        public static void HandleModelErrors(IEnumerable<string> Errors,
-           ref ModelStateDictionary ModelState)
-        {
-            foreach (string error in Errors)
-            {
-                ModelState.AddModelError(string.Empty, error);
-            }
-        }
-
         public static async Task<string?> UploadCarImage(IFormFile Image)
         {
             if (Image == null || Image.Length == 0)

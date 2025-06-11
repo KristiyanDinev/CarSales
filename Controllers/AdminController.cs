@@ -1,5 +1,6 @@
 ﻿using CarSales.Enums;
 using CarSales.Models;
+using CarSales.Models.Database;
 using CarSales.Models.Forms;
 using CarSales.Models.Identity;
 using CarSales.Models.Views.Admin;
@@ -34,23 +35,23 @@ namespace CarSales.Controllers
 
         [HttpGet]
         [Route("/admin")]
-        public async Task<IActionResult> Index()
+        [Route("/admin/cars")]
+        public async Task<IActionResult> Cars()
         {
             string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
             if (userId == null)
             {
                 return Unauthorized();
             }
 
             IdentityUserModel? currentUser = await _userManager.FindByIdAsync(userId);
-
             if (currentUser == null)
             {
                 return Unauthorized();
             }
 
-            return View(new AdminHomeViewModel {
+            return View(new AdminHomeViewModel
+            {
                 Cars = await _carService.GetCarsAsync(new CarQueryParameters
                 {
                     SortBy = CarSortEnum.CreatedAt,
@@ -61,12 +62,37 @@ namespace CarSales.Controllers
         }
 
 
+        [HttpGet]
+        [Route("/admin/users")]
+        public async Task<IActionResult> Users()
+        {
+            string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            IdentityUserModel? currentUser = await _userManager.FindByIdAsync(userId);
+            if (currentUser == null)
+            {
+                return Unauthorized();
+            }
+
+            return View(new AdminHomeViewModel
+            {
+                User = currentUser,
+                Users = new List<IdentityUserModel>()
+            });
+        }
+
+
         [HttpPost]
         [Route("/admin/car/create")]
         public async Task<IActionResult> CreateCar([FromForm] CreateCarFormModel createCarForm)
         {
             if (!ModelState.IsValid)
             {
+                ModelState.AddModelError(string.Empty, "Invalid Model.");
                 return BadRequest();
             }
 
@@ -93,6 +119,7 @@ namespace CarSales.Controllers
         {
             if (!ModelState.IsValid)
             {
+                ModelState.AddModelError(string.Empty, "Invalid Model.");
                 return BadRequest();
             }
 
@@ -108,9 +135,24 @@ namespace CarSales.Controllers
                 return BadRequest();
             }
 
+            TempData["SuccessStatus"] = "Edited!";
             return Ok();
         }
 
+
+        [HttpPost]
+        [Route("/admin/car/delete/{id}")]
+        public async Task<IActionResult> DeleteCar(int id)
+        {
+            if (!await _carService.DeleteCarAsync(id))
+            {
+                ModelState.AddModelError(string.Empty, "Couldn't delete Car.");
+                return BadRequest();
+            }
+
+            TempData["SuccessStatus"] = "Deleted!";
+            return Ok();
+        }
 
 
         [HttpPost]

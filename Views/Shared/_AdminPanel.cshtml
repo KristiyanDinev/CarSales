@@ -1,0 +1,36 @@
+﻿@model CarSales.Models.Identity.IdentityUserModel;
+
+<div class="text-center mb-4">
+    <h1>Admin Page</h1>
+    @await Html.PartialAsync("_User", Model)
+
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-4 mb-4">
+                <a href="/admin/cars" class="text-decoration-none text-dark">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Manage Cars</h5>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <a href="/admin/users" class="text-decoration-none text-dark">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Manage Users</h5>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn btn-success mt-2" onclick="toggleForm()">Add New Car</button>
+
+    @await Html.PartialAsync("_ShowSuccess")
+
+    @await Html.PartialAsync("_ShowError")
+</div>

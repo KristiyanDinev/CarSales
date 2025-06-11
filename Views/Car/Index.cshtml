@@ -1,1 +1,15 @@
-﻿<h1>Cars</h1>
+﻿@model CarSales.Models.Identity.IdentityUserModel;
+@{
+    ViewData["Title"] = "Cars";
+}
+
+<head>
+    @await Html.PartialAsync("_Imports")
+</head>
+
+<body>
+    @await Html.PartialAsync("_User", Model)
+    @await Html.PartialAsync("_ShowSuccess")
+
+
+</body>

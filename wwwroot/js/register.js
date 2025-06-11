@@ -1,4 +1,24 @@
-﻿
+﻿const togglePassword = document.getElementById('togglePassword')
+const passwordInput = document.getElementById('Password');
+
+togglePassword.addEventListener('click', function () {
+    const type = passwordInput.type === 'password' ? 'text' : 'password';
+    passwordInput.type = type;
+    this.classList.toggle('bi-eye-slash');
+    this.classList.toggle('bi-eye');
+});
+
+
+const togglePassword1 = document.getElementById('togglePassword1')
+const ConfirmPasswordInput = document.getElementById('ConfirmPassword');
+
+togglePassword1.addEventListener('click', function () {
+    const type = ConfirmPasswordInput.type === 'password' ? 'text' : 'password';
+    ConfirmPasswordInput.type = type;
+    this.classList.toggle('bi-eye-slash');
+    this.classList.toggle('bi-eye');
+});
+
 
 async function register() {
     const formData = new FormData();

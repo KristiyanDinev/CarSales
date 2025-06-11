@@ -117,5 +117,18 @@ namespace CarSales.Services
             _databasesContext.Cars.Update(car);
             return await _databasesContext.SaveChangesAsync() > 0;
         }
+
+
+        public async Task<bool> DeleteCarAsync(int id)
+        {
+            CarModel? car = await _databasesContext.Cars.FirstOrDefaultAsync(c => c.Id == id);
+            if (car == null)
+            {
+                return false;
+            }
+
+            _databasesContext.Cars.Remove(car);
+            return await _databasesContext.SaveChangesAsync() > 0;
+        }
     }
 }
