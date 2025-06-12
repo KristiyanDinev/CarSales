@@ -21,13 +21,14 @@
 
     <div class="container">
         @await Html.PartialAsync("_SearchCars")
+        @await Html.PartialAsync("_Paging", Model.CurrentPage)
     </div>
 
     <div class="container mt-5">
         <div class="row justify-content-center">
             @foreach (CarModel car in Model.Cars)
             {
-                <div class="col-md-4 col-sm-6 mb-4 d-flex justify-content-center">
+                <div class="col-md-4 col-sm-6 mb-4 d-flex justify-content-center car-row">
                     <div class="card h-100" style="cursor: pointer;" onclick="window.location.pathname = '/car/@car.Id'">
                         <img src="@car.ImageUrl" class="card-img-top" alt="@car.Model">
                         <div class="card-body">

@@ -108,7 +108,12 @@ namespace CarSales.Services
         public async Task<bool> DeleteCarAsync(int id)
         {
             CarModel? car = await _databasesContext.Cars.FirstOrDefaultAsync(c => c.Id == id);
-            if (car == null || !Utility.DeleteImage(car.ImageUrl))
+            if (car == null)
+            {
+                return false;
+            }
+
+            if (!Utility.DeleteImage(car.ImageUrl)) 
             {
                 return false;
             }

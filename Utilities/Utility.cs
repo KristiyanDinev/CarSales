@@ -15,16 +15,14 @@ namespace CarSales.Utilities
             }
 
             string uploadsFolder = Path.Combine("wwwroot", "images", "cars");
-            Directory.CreateDirectory(uploadsFolder);
-
             string uniqueFileName = $"{Guid.NewGuid()}.png";
-            string imagePath = Path.Combine(uploadsFolder, uniqueFileName);
 
             try
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(imagePath)!);
+                Directory.CreateDirectory(uploadsFolder);
+                using FileStream stream = new FileStream(
+                    Path.Combine(uploadsFolder, uniqueFileName), FileMode.Create);
 
-                using FileStream stream = new FileStream(imagePath, FileMode.Create);
                 await Image.CopyToAsync(stream);
 
                 return $"/images/cars/{uniqueFileName}";
@@ -42,11 +40,10 @@ namespace CarSales.Utilities
                 return null;
             }
 
-            string uploadsFolder = Path.Combine("wwwroot", "images", "cars");
-            string oldImagePath = Path.Combine(uploadsFolder, OldImage.TrimStart('/'));
+            string uploadsFolder = Path.Combine("wwwroot", "images", "cars").Replace("\\", "/");
+            string oldImagePath = Path.Combine("wwwroot", OldImage.TrimStart('/')).Replace("\\", "/");
 
             string uniqueFileName = $"{Guid.NewGuid()}.png";
-            string imagePath = Path.Combine(uploadsFolder, uniqueFileName);
 
             try
             {
@@ -56,7 +53,8 @@ namespace CarSales.Utilities
                 }
 
                 using FileStream stream = new FileStream(
-                    Path.Combine(uploadsFolder, uniqueFileName), FileMode.Create);
+                    Path.Combine(uploadsFolder, uniqueFileName).Replace("\\", "/"), 
+                    FileMode.Create);
 
                 await Image.CopyToAsync(stream);
                 return $"/images/cars/{uniqueFileName}";

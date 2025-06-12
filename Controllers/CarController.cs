@@ -47,6 +47,7 @@ namespace CarSales.Controllers
             return View(new UserCarsModel
             {
                 User = currentUser,
+                CurrentPage = carQuery.Page,
                 IsAdmin = await _userManager.IsInRoleAsync(currentUser, Utility.AdminRoleName),
                 Cars = await _carService.GetCarsAsync(carQuery)
             });
@@ -78,6 +79,7 @@ namespace CarSales.Controllers
             return View(new UserCarsModel
             {
                 User = currentUser,
+                CurrentPage = 0,
                 IsAdmin = await _userManager.IsInRoleAsync(currentUser, Utility.AdminRoleName),
                 Cars = new List<CarModel> { car }
             });
