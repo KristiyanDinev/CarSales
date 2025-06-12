@@ -1,4 +1,7 @@
-﻿using CarSales.Models.Identity;
+﻿using CarSales.Models;
+using CarSales.Models.Database;
+using CarSales.Models.Identity;
+using CarSales.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -15,15 +18,18 @@ namespace CarSales.Controllers
     public class CarController : Controller
     {
         private readonly UserManager<IdentityUserModel> _userManager;
+        private readonly CarService _carService;
 
-        public CarController(UserManager<IdentityUserModel> userManager) {
+        public CarController(UserManager<IdentityUserModel> userManager, 
+            CarService carService) {
             _userManager = userManager;
+            _carService = carService;
         }
 
 
         [HttpGet]
         [Route("/cars")]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index([FromQuery] CarQueryParametersModel carQuery)
         {
             string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null)
@@ -37,7 +43,11 @@ namespace CarSales.Controllers
                 return Unauthorized();
             }
 
-            return View(currentUser);
+            return View(new UserCarsModel
+            {
+                User = currentUser,
+                Cars = await _carService.GetCarsAsync(carQuery)
+            });
         }
 
 
@@ -57,7 +67,17 @@ namespace CarSales.Controllers
                 return Unauthorized();
             }
 
-            return View();
+            CarModel? car = await _carService.GetCarByIdAsync(id);
+            if (car == null)
+            {
+                return NotFound();
+            }
+
+            return View(new UserCarsModel
+            {
+                User = currentUser,
+                Cars = new List<CarModel> { car }
+            });
         }
     }
 }

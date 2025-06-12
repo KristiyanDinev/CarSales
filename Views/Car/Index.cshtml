@@ -1,4 +1,5 @@
-﻿@model CarSales.Models.Identity.IdentityUserModel;
+﻿@using CarSales.Models.Database;
+@model CarSales.Models.UserCarsModel;
 @{
     ViewData["Title"] = "Cars";
 }
@@ -8,8 +9,32 @@
 </head>
 
 <body>
-    @await Html.PartialAsync("_User", Model)
+    @await Html.PartialAsync("_User", Model.User)
     @await Html.PartialAsync("_ShowSuccess")
 
 
+    <h1 class="text-center">Cars</h1>
+    @await Html.PartialAsync("_SearchCars")
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            @foreach (CarModel car in Model.Cars)
+            {
+                <div class="col-md-4 col-sm-6 mb-4 d-flex justify-content-center">
+                    <div class="card h-100" style="cursor: pointer;" onclick="window.location.pathname = '/car/@car.Id'">
+                        <img src="@car.ImageUrl" class="card-img-top" alt="@car.Model">
+                        <div class="card-body">
+                            <h4 class="card-title">@car.Model</h4>
+                            <h6 class="card-subtitle text-muted">@car.Make</h6>
+                            <p class="card-text mt-2">Price: @car.Price.ToString("C")</p>
+                            <p class="card-text">Year: @car.Year</p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+
+    <script src="~/js/cars.js"></script>
 </body>

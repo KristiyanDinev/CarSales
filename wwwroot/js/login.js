@@ -14,7 +14,7 @@ async function login() {
     const formData = new FormData();
     formData.append("Email", document.getElementById("Email").value);
     formData.append("Password", document.getElementById("Password").value);
-    formData.append("RememberMe", document.getElementById("RememberMe").value !== null);
+    formData.append("RememberMe", document.getElementById("RememberMe").checked);
 
     try {
         const response = await fetch("/login", {

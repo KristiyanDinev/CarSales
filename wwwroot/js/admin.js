@@ -177,9 +177,7 @@ function page(pageNumber) {
         alert("You are already on the last page.")
         return
     }
-    const params = new URLSearchParams({
-        page: pageNumber
-    })
 
-    window.location.href = window.location.pathname + `?${params.toString()}`
+    window.location.href = window.location.pathname +
+        `?${new URLSearchParams({ page: pageNumber }).toString()}`
 }

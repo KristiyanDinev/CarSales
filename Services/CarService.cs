@@ -23,16 +23,13 @@ namespace CarSales.Services
             IQueryable<CarModel> query = _databasesContext.Cars.AsQueryable();
 
             // Filtering
-            if (!string.IsNullOrEmpty(parameters.Make)) {
-                query = query.Where(c => c.Make == parameters.Make);
-            }
-
-            if (parameters.Pirce.HasValue)
+            if (!string.IsNullOrEmpty(parameters.Make))
             {
-                query = query.Where(c => c.Price == parameters.Pirce);
+                query = query.Where(c => c.Make.Equals(parameters.Make));
             }
 
-            if (parameters.Model != null) {
+            if (!string.IsNullOrEmpty(parameters.Model))
+            {
                 query = query.Where(c => c.Model == parameters.Model);
             }
 
@@ -47,17 +44,11 @@ namespace CarSales.Services
                 CarSortEnum.Price => parameters.SortDescending ? query.OrderByDescending(c => c.Price) : query.OrderBy(c => c.Price),
                 CarSortEnum.Year => parameters.SortDescending ? query.OrderByDescending(c => c.Year) : query.OrderBy(c => c.Year),
                 CarSortEnum.CreatedAt => parameters.SortDescending ? query.OrderByDescending(c => c.CreatedAt) : query.OrderBy(c => c.CreatedAt),
-                CarSortEnum.None => query.OrderByDescending(c => c.CreatedAt) // Default
-,
-                _ => throw new NotImplementedException()
+
+                _ => throw new ArgumentException()
             };
 
-            // Paging
-            query = query
-                .Skip((parameters.Page - 1) * Utility.pageSize)
-                .Take(Utility.pageSize);
-
-            return await query.ToListAsync();
+            return await Utility.GetPageAsync<CarModel>(query, parameters.Page);
         }
 
         public async Task<bool> CreateCarAsync(CreateCarFormModel createCarForm)
@@ -75,12 +66,12 @@ namespace CarSales.Services
 
             CarModel car = new CarModel
             {
-                Make = createCarForm.Make,
-                Model = createCarForm.Model,
+                Make = createCarForm.Make.ToUpper(),
+                Model = createCarForm.Model.ToUpper(),
                 Year = createCarForm.Year,
                 Price = createCarForm.Price,
                 Description = createCarForm.Description,
-                Color = createCarForm.Color,
+                Color = createCarForm.Color.ToUpper(),
                 ImageUrl = imageUrl,
             };
 
@@ -92,7 +83,8 @@ namespace CarSales.Services
         {
             CarModel? car = await _databasesContext.Cars
                 .FirstOrDefaultAsync(c => c.Id == createCarForm.Id);
-            if (car == null) { 
+            if (car == null)
+            {
                 return false;
             }
 
@@ -107,12 +99,12 @@ namespace CarSales.Services
                 car.ImageUrl = imageUrl;
             }
 
-            car.Make = createCarForm.Make;
-            car.Model = createCarForm.Model;
+            car.Make = createCarForm.Make.ToUpper();
+            car.Model = createCarForm.Model.ToUpper();
             car.Year = createCarForm.Year;
             car.Price = createCarForm.Price;
             car.Description = createCarForm.Description;
-            car.Color = createCarForm.Color;
+            car.Color = createCarForm.Color.ToUpper();
 
             _databasesContext.Cars.Update(car);
             return await _databasesContext.SaveChangesAsync() > 0;
@@ -128,6 +120,12 @@ namespace CarSales.Services
 
             _databasesContext.Cars.Remove(car);
             return await _databasesContext.SaveChangesAsync() > 0;
+        }
+
+        public async Task<CarModel?> GetCarByIdAsync(int id)
+        {
+            return await _databasesContext.Cars
+                .FirstOrDefaultAsync(c => c.Id == id);
         }
     }
 }

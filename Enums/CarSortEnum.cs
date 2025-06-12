@@ -4,7 +4,6 @@
     {
         Price,
         Year,
-        CreatedAt,
-        None
+        CreatedAt
     }
 }

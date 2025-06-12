@@ -1,0 +1,59 @@
+﻿<!-- requires /js/cars.js -->
+<button onclick="toggleCarSearch()" class="btn btn-primary mt-2 mb-2">Search Cars</button>
+
+<div class="card m-3 p-3" id="searchCars" style="display:none;">
+    <div class="card-body">
+        <h4 class="card-title" id="searchCarsTitle">Search Cars</h4>
+
+        <div class="form-group m-2">
+            <label class="form-label card-text" for="ModelSearch">Model</label>
+            <input class="form-control" type="text" id="ModelSearch" placeholder="Car Model: VAN, SUV, SPORT" />
+        </div>
+
+        <div class="form-group m-2">
+            <label class="form-label card-text" for="MakeSearch">Make</label>
+            <input class="form-control" type="text" id="MakeSearch" placeholder="Car Make: TOYOTA, FORD, HONDA" />
+        </div>
+
+        <div class="form-group m-2">
+            <label class="form-label card-text" for="YearSearch">Year</label>
+            <input class="form-control" type="number" id="YearSearch" min="1000" max="2999" required />
+        </div>
+
+        <h5 class="card-text">Sort by</h5>
+
+        <div class="form-group m-2 d-flex flex-wrap gap-3">
+            <div class="form-check form-check-inline">
+                <input class="form-check-input rounded-circle" type="radio" name="Sort" id="PriceAsc" value="">
+                <label class="form-check-label ms-1" for="PriceAsc">Price Ascending</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input rounded-circle" type="radio" name="Sort" id="PriceDesc">
+                <label class="form-check-label ms-1" for="PriceDesc">Price Descending</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input rounded-circle" type="radio" name="Sort" id="YearAsc">
+                <label class="form-check-label ms-1" for="YearAsc">Year Ascending</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input rounded-circle" type="radio" name="Sort" id="YearDesc">
+                <label class="form-check-label ms-1" for="YearDesc">Year Descending</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input rounded-circle" type="radio" name="Sort" id="NoneSort">
+                <label class="form-check-label ms-1" for="NoneSort">None</label>
+            </div>
+        </div>
+
+        <div class="input-group mt-3" onclick="seachCars()" style="cursor: pointer">
+            <button class="btn btn-primary card-text">Seach</button>
+            <i class="bi bi-search input-group-text"></i>
+        </div>
+
+        <div class="input-group mt-3" onclick="cancelCarSearch()" style="cursor: pointer">
+            <button class="btn btn-secondary" onclick="cancelCarSearch()">Cancel</button>
+            <i class="bi bi-x-square input-group-text"></i>
+        </div>
+    </div>
+
+</div>
