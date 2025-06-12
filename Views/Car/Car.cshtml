@@ -13,14 +13,19 @@
 <body>
     @await Html.PartialAsync("_User", Model.User)
 
+    @if (Model.IsAdmin)
+    {
+        <button onclick="window.location.pathname = '/admin'" class="btn btn-success m-4">Admin Panel</button>
+    }
+
     <div class="row justify-content-center">
         <div class="col-md-5 col-sm-8 mb-4 d-flex justify-content-center">
             <div class="card h-100" style="width: 100%; max-width: 500px;">
                 <img src="@car.ImageUrl" class="card-img-top" style="height: 300px; object-fit: cover;" alt="@car.Model">
                 <div class="card-body">
-                    <h4 class="card-title">@car.Model</h4>
-                    <h6 class="card-subtitle mb-2 text-muted">@car.Make</h6>
-                    <p class="card-text mt-2">Price: @car.Price.ToString("C")</p>
+                    <h4 class="card-title"><strong>@car.Model</strong></h4>
+                    <h6 class="card-subtitle mb-4"><strong>@car.Make</strong></h6>
+                    <p class="card-text">Price: @car.Price.ToString("C")</p>
                     <p class="card-text">Year: @car.Year</p>
                     <p class="card-text">Color: @car.Color</p>
                     <p class="card-text">Description: @car.Description</p>

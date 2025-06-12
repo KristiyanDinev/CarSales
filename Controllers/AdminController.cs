@@ -19,7 +19,6 @@ namespace CarSales.Controllers
     [ApiController]
     public class AdminController : Controller
     {
-        private static readonly string AdminRoleName = "Admin";
         private readonly UserManager<IdentityUserModel> _userManager;
         private readonly RoleManager<IdentityRoleModel> _roleManager;
         private readonly CarService _carService;
@@ -85,7 +84,7 @@ namespace CarSales.Controllers
                 usersView.Add(new UserViewAdminModel
                 {
                     User = user,
-                    IsAdmin = await _userManager.IsInRoleAsync(user, AdminRoleName)
+                    IsAdmin = await _userManager.IsInRoleAsync(user, Utility.AdminRoleName)
                 });
             }
 
@@ -177,7 +176,7 @@ namespace CarSales.Controllers
                 return BadRequest();
             }
 
-            IdentityRoleModel? role = await _roleManager.FindByNameAsync(AdminRoleName);
+            IdentityRoleModel? role = await _roleManager.FindByNameAsync(Utility.AdminRoleName);
             if (role == null)
             {
                 TempData["Error"] = "Role not found.";
@@ -194,11 +193,11 @@ namespace CarSales.Controllers
             IdentityResult result;
             if (userAndRoleForm.IsAdmin)
             {
-                result = await _userManager.AddToRoleAsync(user, AdminRoleName);
+                result = await _userManager.AddToRoleAsync(user, Utility.AdminRoleName);
 
             } else
             {
-                result = await _userManager.RemoveFromRoleAsync(user, AdminRoleName);
+                result = await _userManager.RemoveFromRoleAsync(user, Utility.AdminRoleName);
             }
 
             if (result.Succeeded)

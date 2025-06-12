@@ -62,20 +62,16 @@ namespace CarSales
                 // Cookie settings
                 options.Cookie.HttpOnly = true;
                 options.LoginPath = "/login";
-                options.LogoutPath = "/logout";
-                options.AccessDeniedPath = "/login";
+                options.AccessDeniedPath = "/accessdenied";
                 options.SlidingExpiration = true;
                 options.ExpireTimeSpan = TimeSpan.FromDays(3);
                 options.Cookie.Name = "Authentication";
                 options.ReturnUrlParameter = string.Empty;
             });
 
-            builder.Services.AddSwaggerGen();
-
             WebApplication app = builder.Build();
 
             app.MapIdentityApi<IdentityUserModel>();
-            app.MapSwagger();
 
             app.UseStaticFiles();
 

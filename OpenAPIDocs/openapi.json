@@ -1,0 +1,505 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Car Sales API",
+    "description": "A website where people can visit and see different car offers.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/accessdenied": {
+      "get": {
+        "summary": "Access Denied",
+        "responses": {
+          "200": {
+            "description": "Access denied view"
+          }
+        }
+      }
+    },
+    "/register": {
+      "get": {
+        "summary": "Get registration form",
+        "responses": {
+          "200": {
+            "description": "Registration view"
+          }
+        }
+      },
+      "post": {
+        "summary": "Register a new user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterFormModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Registration successful"
+          },
+          "401": {
+            "description": "Registration failed"
+          }
+        }
+      }
+    },
+    "/login": {
+      "get": {
+        "summary": "Get login form",
+        "responses": {
+          "200": {
+            "description": "Login view"
+          }
+        }
+      },
+      "post": {
+        "summary": "Authenticate user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginFormModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful"
+          },
+          "400": {
+            "description": "Login failed"
+          }
+        }
+      }
+    },
+    "/logout": {
+      "post": {
+        "summary": "Logout current user",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Logged out"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/cars": {
+      "get": {
+        "summary": "Get list of cars",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "Make",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "Model",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "Year",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "SortBy",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "SortDescending",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "Page",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of cars"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/car/{id}": {
+      "get": {
+        "summary": "Get car by ID",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Car details"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/admin": {
+      "get": {
+        "summary": "Admin car list",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "Make",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "Model",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "Year",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "SortBy",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "SortDescending",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "Page",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Admin car list"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/admin/users": {
+      "get": {
+        "summary": "Admin user list",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "Page",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User list"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/admin/car/create": {
+      "post": {
+        "summary": "Create car (admin)",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCarFormModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Car created"
+          },
+          "400": {
+            "description": "Bad request"
+          }
+        }
+      }
+    },
+    "/admin/car/edit": {
+      "post": {
+        "summary": "Edit car (admin)",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCarFormModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Car edited"
+          },
+          "400": {
+            "description": "Bad request"
+          }
+        }
+      }
+    },
+    "/admin/car/delete/{id}": {
+      "post": {
+        "summary": "Delete car by ID (admin)",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "400": {
+            "description": "Failed to delete"
+          }
+        }
+      }
+    },
+    "/admin/user/role": {
+      "post": {
+        "summary": "Toggle user admin role",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/UserRoleFormModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Role updated"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "User or role not found"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authentication"
+      }
+    },
+    "schemas": {
+      "RegisterFormModel": {
+        "type": "object",
+        "required": [
+          "UserName",
+          "Email",
+          "PhoneNumber",
+          "Password",
+          "ConfirmPassword"
+        ],
+        "properties": {
+          "UserName": {
+            "type": "string"
+          },
+          "Email": {
+            "type": "string",
+            "format": "email"
+          },
+          "PhoneNumber": {
+            "type": "string"
+          },
+          "Password": {
+            "type": "string",
+            "format": "password"
+          },
+          "ConfirmPassword": {
+            "type": "string",
+            "format": "password"
+          }
+        }
+      },
+      "LoginFormModel": {
+        "type": "object",
+        "required": [
+          "Email",
+          "Password"
+        ],
+        "properties": {
+          "Email": {
+            "type": "string",
+            "format": "email"
+          },
+          "Password": {
+            "type": "string",
+            "format": "password"
+          },
+          "RememberMe": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CreateCarFormModel": {
+        "type": "object",
+        "properties": {
+          "Id": {
+            "type": "integer"
+          },
+          "Make": {
+            "type": "string"
+          },
+          "Model": {
+            "type": "string"
+          },
+          "Year": {
+            "type": "integer"
+          },
+          "Price": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "Color": {
+            "type": "string"
+          },
+          "Description": {
+            "type": "string"
+          },
+          "Image": {
+            "type": "string",
+            "format": "binary"
+          }
+        }
+      },
+      "UserRoleFormModel": {
+        "type": "object",
+        "required": [
+          "UserId",
+          "IsAdmin"
+        ],
+        "properties": {
+          "UserId": {
+            "type": "string"
+          },
+          "IsAdmin": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  }
+}

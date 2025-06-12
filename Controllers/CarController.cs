@@ -2,6 +2,7 @@
 using CarSales.Models.Database;
 using CarSales.Models.Identity;
 using CarSales.Services;
+using CarSales.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -46,6 +47,7 @@ namespace CarSales.Controllers
             return View(new UserCarsModel
             {
                 User = currentUser,
+                IsAdmin = await _userManager.IsInRoleAsync(currentUser, Utility.AdminRoleName),
                 Cars = await _carService.GetCarsAsync(carQuery)
             });
         }
@@ -76,6 +78,7 @@ namespace CarSales.Controllers
             return View(new UserCarsModel
             {
                 User = currentUser,
+                IsAdmin = await _userManager.IsInRoleAsync(currentUser, Utility.AdminRoleName),
                 Cars = new List<CarModel> { car }
             });
         }

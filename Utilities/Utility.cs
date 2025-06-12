@@ -5,6 +5,7 @@ namespace CarSales.Utilities
     public class Utility
     {
         public static int pageSize = 10;
+        public static string AdminRoleName = "Admin";
 
         public static async Task<string?> UploadCarImage(IFormFile Image)
         {

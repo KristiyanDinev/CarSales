@@ -1,8 +1,13 @@
 ﻿@model CarSales.Models.Identity.IdentityUserModel;
 
-<div class="alert alert-info d-flex align-items-center mt-3" role="alert">
+<div class="container alert alert-info d-flex align-items-center mt-3" role="alert">
     <i class="bi bi-person-circle me-2 fs-4"></i>
     <div>
         Logged in as: <strong>@Model.UserName</strong>
     </div>
+
+    <div class="ms-auto">
+        <button onclick="logout()" class="btn btn-danger">Logout</button>
+    </div>
 </div>
+

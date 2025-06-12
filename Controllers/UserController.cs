@@ -3,6 +3,7 @@ using CarSales.Models.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using System.Security.Claims;
 using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace CarSales.Controllers
@@ -24,10 +25,23 @@ namespace CarSales.Controllers
             _signInManager = signInManager;
         }
 
+
+        [HttpGet]
+        [Route("/accessdenied")]
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
+
         [HttpGet]
         [Route("/register")]
-        public IActionResult Register()
+        public async Task<IActionResult> Register()
         {
+            string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId != null && await _userManager.FindByIdAsync(userId) != null)
+            {
+                return RedirectToAction("Index", "Car");
+            }
             return View();
         }
 
@@ -35,8 +49,13 @@ namespace CarSales.Controllers
         [HttpGet]
         [Route("/")]
         [Route("/login")]
-        public IActionResult Login()
+        public async Task<IActionResult> Login()
         {
+            string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId != null && await _userManager.FindByIdAsync(userId) != null)
+            {
+                return RedirectToAction("Index", "Car");
+            }
             return View();
         }
         
@@ -109,6 +128,11 @@ namespace CarSales.Controllers
         [HttpPost]
         [Route("/logout")]
         public async Task<IActionResult> Logout() {
+            string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null || await _userManager.FindByIdAsync(userId) == null)
+            {
+                return Unauthorized();
+            }
             await _signInManager.SignOutAsync();
             return Ok();
         }
