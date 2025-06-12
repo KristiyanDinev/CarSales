@@ -9,43 +9,25 @@ namespace CarSales.Utilities
 
         public static async Task<string?> UploadCarImage(IFormFile Image)
         {
-            if (Image == null || Image.Length == 0)
+            if (Image == null)
             {
                 return null;
             }
 
-            // wwwroot/images/cars/{carId}.png
-            string[] files = Directory.GetFiles(Path.Combine("wwwroot", "images", "cars"));
+            string uploadsFolder = Path.Combine("wwwroot", "images", "cars");
+            Directory.CreateDirectory(uploadsFolder);
 
-            int imageId = 0;
-            foreach (string fileName in files)
-            {
-                try
-                {
-                    int id = int.Parse(fileName.Split('.')[0]);
-                    if (id > imageId)
-                    {
-                        imageId = id;
-                    }
-                }
-                catch (Exception)
-                {
-                    continue;
-                }
-            }
-
-            imageId++;
-            string imagePath = $"wwwroot/images/cars/{imageId}.png";
-            string res = $"/images/cars/{imageId}.png";
+            string uniqueFileName = $"{Guid.NewGuid()}.png";
+            string imagePath = Path.Combine(uploadsFolder, uniqueFileName);
 
             try
             {
-                // Ensure the directory exists
                 Directory.CreateDirectory(Path.GetDirectoryName(imagePath)!);
 
-                await Image.CopyToAsync(new FileStream(imagePath, FileMode.Create));
-                return res;
+                using FileStream stream = new FileStream(imagePath, FileMode.Create);
+                await Image.CopyToAsync(stream);
 
+                return $"/images/cars/{uniqueFileName}";
             }
             catch (Exception)
             {
@@ -59,27 +41,25 @@ namespace CarSales.Utilities
             {
                 return null;
             }
-            // wwwroot/images/users/{userId}.png
-            string[] imagePathParts = OldImage.Split('.');
 
-            if (!int.TryParse(imagePathParts[imagePathParts.Length - 2], out int imageId))
-            {
-                return null;
-            }
+            string uploadsFolder = Path.Combine("wwwroot", "images", "cars");
+            string oldImagePath = Path.Combine(uploadsFolder, OldImage.TrimStart('/'));
 
-            string imagePath = $"wwwroot/images/cars/{imageId}.png";
-            string res = $"/images/cars/{imageId}.png";
+            string uniqueFileName = $"{Guid.NewGuid()}.png";
+            string imagePath = Path.Combine(uploadsFolder, uniqueFileName);
+
             try
             {
-                // Ensure the directory exists
-                Directory.CreateDirectory(Path.GetDirectoryName(imagePath)!);
-                if (File.Exists(imagePath))
+                if (File.Exists(oldImagePath))
                 {
-                    // Delete the existing image file
-                    File.Delete(imagePath);
+                    File.Delete(oldImagePath);
                 }
-                await Image.CopyToAsync(new FileStream(imagePath, FileMode.Create));
-                return res;
+
+                using FileStream stream = new FileStream(
+                    Path.Combine(uploadsFolder, uniqueFileName), FileMode.Create);
+
+                await Image.CopyToAsync(stream);
+                return $"/images/cars/{uniqueFileName}";
             }
             catch (Exception)
             {
@@ -112,6 +92,5 @@ namespace CarSales.Utilities
                 .Take(pageSize)
                 .ToListAsync();
         }
-
     }
 }

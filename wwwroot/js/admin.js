@@ -14,7 +14,7 @@ function readURL(input) {
 function toggleForm() {
     document.getElementById("carFormContainer").style.display = "block";
     document.getElementById("formTitle").innerText = "Add New Car";
-    document.getElementById('carSave').onclick = function () { saveCar() };
+    document.getElementById('carSave').onclick = saveCar;
     clearForm();
     document.getElementById('carImage').onchange = (e) => {
         readURL(e.target); 
@@ -51,6 +51,9 @@ function editCar(carId, Make, Model, Year, Price, Description, Color, Image) {
     document.getElementById('carDescription').value = Description;
     document.getElementById('carImage').value = '';
     document.getElementById('carImagePreview').src = Image;
+    document.getElementById('carImage').onchange = (e) => {
+        readURL(e.target);
+    }
 }
 
 
@@ -111,7 +114,8 @@ async function deleteCar(carId) {
     }
 }
 
-async function saveCar() {
+async function saveCar(e) {
+    e.stopPropagation();
     const make = document.getElementById('carMake').value
     const model = document.getElementById('carModel').value
     const year = document.getElementById('carYear').value
@@ -171,9 +175,9 @@ async function toggleUserAdmin(username, userId, isAdmin) {
 }
 
 
-function page(pageNumber) {
+function page(pageNumber, curPage) {
     let elements = document.getElementsByClassName("car-row")
-    if (elements.length < 10) {
+    if (elements.length < 10 && pageNumber > curPage) {
         alert("You are already on the last page.")
         return
     }

@@ -53,11 +53,6 @@ namespace CarSales.Services
 
         public async Task<bool> CreateCarAsync(CreateCarFormModel createCarForm)
         {
-            if (createCarForm.Image == null)
-            {
-                return false;
-            }
-
             string? imageUrl = await Utility.UploadCarImage(createCarForm.Image!);
             if (imageUrl == null)
             {

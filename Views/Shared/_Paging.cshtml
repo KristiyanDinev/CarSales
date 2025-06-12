@@ -4,13 +4,13 @@
     @if (Model > 1)
     {
         // move forward and backword
-        <button onclick="page(@(Model - 1))" class="btn btn-info btn-sm">⏪ Page <b>@(Model - 1)</b></button>
+        <button onclick="page(@(Model - 1), @Model)" class="btn btn-info btn-sm">⏪ Page <b>@(Model - 1)</b></button>
         <button class="btn btn-primary btn-sm" disabled>Current Page <b>@Model</b></button>
-        <button onclick="page(@(Model + 1))" class="btn btn-info btn-sm">Page <b>@(Model + 1)</b> ⏩</button>
+        <button onclick="page(@(Model + 1), @Model)" class="btn btn-info btn-sm">Page <b>@(Model + 1)</b> ⏩</button>
     }
     else
     {
         // move only forward
-        <button onclick="page(@(Model + 1))" class="btn btn-info btn-sm">Page <b>@(Model + 1)</b> ⏩</button>
+        <button onclick="page(@(Model + 1), @Model)" class="btn btn-info btn-sm">Page <b>@(Model + 1)</b> ⏩</button>
     }
 </div>
