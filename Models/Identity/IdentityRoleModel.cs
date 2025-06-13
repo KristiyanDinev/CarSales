@@ -13,10 +13,5 @@ namespace CarSales.Models.Identity
         {
             Name = "Default";
         }
-
-        public IdentityRoleModel(string roleName) : base(roleName)
-        {
-            Description = "No description provided.";
-        }
     }
 }
